@@ -1,0 +1,36 @@
+@import "tailwindcss";
+
+:root {
+  --dawn-bg: #1a2438;
+  --dawn-card: #243352;
+  --dawn-surface: #2d3f5c;
+  --dawn-text: #e8edf5;
+  --dawn-muted: #9aadc4;
+  --dawn-border: #3d5270;
+  --dawn-navy-deep: #121c2e;
+  --dawn-accent: #b8cce8;
+  --dawn-accent-light: #d4e2f4;
+  --dawn-accent-soft: rgba(184, 204, 232, 0.14);
+}
+
+@theme inline {
+  --color-dawn-bg: var(--dawn-bg);
+  --color-dawn-card: var(--dawn-card);
+  --color-dawn-surface: var(--dawn-surface);
+  --color-dawn-text: var(--dawn-text);
+  --color-dawn-muted: var(--dawn-muted);
+  --color-dawn-border: var(--dawn-border);
+  --color-dawn-navy: var(--dawn-bg);
+  --color-dawn-navy-deep: var(--dawn-navy-deep);
+  --color-dawn-accent: var(--dawn-accent);
+  --color-dawn-accent-light: var(--dawn-accent-light);
+  --color-dawn-accent-soft: var(--dawn-accent-soft);
+  --font-sans: var(--font-maru);
+}
+
+body {
+  background: var(--dawn-bg);
+  color: var(--dawn-text);
+  font-family: var(--font-maru), var(--font-rounded), "Hiragino Maru Gothic ProN",
+    sans-serif;
+}
