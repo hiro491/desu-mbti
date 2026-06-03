@@ -39,3 +39,8 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# local dev data (Supabase 未設定時)
+.data/
+public/uploads/
+public/uploads/avatars/

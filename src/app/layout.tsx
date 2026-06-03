@@ -1,8 +1,25 @@
 import type { Metadata } from "next";
-import { M_PLUS_Rounded_1c, Zen_Maru_Gothic } from "next/font/google";
-import { DiagnosisProvider } from "@/context/DiagnosisContext";
+import {
+  M_PLUS_Rounded_1c,
+  Noto_Sans_JP,
+  Noto_Serif_JP,
+  Zen_Maru_Gothic,
+} from "next/font/google";
 import { SITE_DESCRIPTION, SITE_NAME, getSiteUrl } from "@/lib/site";
 import "./globals.css";
+import { cn } from "@/lib/utils";
+
+const notoSans = Noto_Sans_JP({
+  variable: "--font-noto",
+  subsets: ["latin"],
+  weight: ["400", "500", "700"],
+});
+
+const notoSerif = Noto_Serif_JP({
+  variable: "--font-serif",
+  subsets: ["latin"],
+  weight: ["400", "500"],
+});
 
 const rounded = M_PLUS_Rounded_1c({
   variable: "--font-rounded",
@@ -46,10 +63,16 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ja" className={`${rounded.variable} ${zenMaru.variable}`}>
-      <body className="antialiased">
-        <DiagnosisProvider>{children}</DiagnosisProvider>
-      </body>
+    <html
+      lang="ja"
+      className={cn(
+        notoSans.variable,
+        notoSerif.variable,
+        rounded.variable,
+        zenMaru.variable
+      )}
+    >
+      <body className="font-sans antialiased">{children}</body>
     </html>
   );
 }

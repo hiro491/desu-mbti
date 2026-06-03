@@ -1,29 +1,27 @@
-import Link from "next/link";
-import { PageShell } from "@/components/PageShell";
-import { QUESTION_COUNT } from "@/data/questions";
+import { CreatePageForm } from "@/components/home/CreatePageForm";
+import { EventBackground } from "@/components/board/EventBackground";
+import { SITE_DESCRIPTION, SITE_NAME } from "@/lib/site";
 
 export default function HomePage() {
   return (
-    <PageShell>
-      <section className="rounded-2xl border border-dawn-border bg-dawn-card p-6 shadow-sm sm:p-8">
-        <p className="text-sm leading-relaxed text-dawn-muted">
-          デスMBTI（死生観MBTI）は、死への情緒・死後の世界観・他者との距離・終末期のスタンスという4つの軸から、あなたの「今の死生観」を16タイプでやさしく映し出す診断です。
-        </p>
-        <p className="mt-4 text-sm leading-relaxed text-dawn-muted">
-          全{QUESTION_COUNT}問・1〜5のボタンで回答します。結果はパーセンテージのグラデーションと、動物キャラクターでお伝えします。
-        </p>
-        <p className="mt-4 text-sm leading-relaxed text-dawn-muted">
-          正解はありません。いまの気持ちに近いほうを選んでください。
-        </p>
-        <div className="mt-8 flex justify-center">
-          <Link
-            href="/question"
-            className="inline-flex w-full max-w-xs items-center justify-center rounded-xl bg-dawn-accent px-6 py-3.5 text-sm font-bold text-dawn-navy-deep shadow-sm transition hover:bg-dawn-accent-light active:scale-[0.98]"
-          >
-            診断をスタートする
-          </Link>
+    <EventBackground>
+      <main className="px-4 py-12 sm:py-16">
+        <div className="mx-auto max-w-lg text-center">
+          <p className="text-[13px] tracking-wide text-[#9a9590]">
+            デジタルメッセージボード
+          </p>
+          <h1 className="mt-2 font-serif text-[2rem] font-normal tracking-wide text-[#5a5a5a] sm:text-4xl">
+            {SITE_NAME}
+          </h1>
+          <p className="mt-4 text-[15px] leading-relaxed text-[#9a9590]">
+            {SITE_DESCRIPTION}
+          </p>
         </div>
-      </section>
-    </PageShell>
+
+        <div className="mx-auto mt-10 max-w-md">
+          <CreatePageForm />
+        </div>
+      </main>
+    </EventBackground>
   );
 }
