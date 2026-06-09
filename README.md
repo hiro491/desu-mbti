@@ -1,30 +1,32 @@
-# みんなの寄せ書き
+# 死生観診断
 
-**desu-mbti（デスMBTI）とは別プロジェクト**の、デジタル寄せ書き Web アプリです。
+死への情緒・死後の世界観・他者との距離・終末期のスタンスの4軸から、今のあなたの死生観を16タイプで診断する Web アプリです。
 
-ボタンひとつで寄せ書きページができ、メッセージと写真が集まります。
+## 技術スタック
+
+- Next.js (App Router)
+- TypeScript
+- Tailwind CSS
 
 ## ローカル開発
 
 ```bash
 npm install
-cp .env.example .env.local
-# .env.local に Supabase のキーを設定（省略時は .data にローカル保存）
 npm run dev
 ```
 
 http://localhost:3000 を開いてください。
 
-## 本番公開
+## デプロイ（Vercel）
 
-**Vercel + Supabase** で公開します。
+1. このリポジトリを GitHub に push
+2. [Vercel](https://vercel.com) でリポジトリを Import
+3. 環境変数 `NEXT_PUBLIC_SITE_URL` に本番 URL を設定
+4. Deploy
 
-- [docs/deploy.md](docs/deploy.md) — Vercel デプロイ手順
-- [docs/supabase-setup.md](docs/supabase-setup.md) — DB・Storage 設定
+## ビルド
 
-公開用には **新しい GitHub リポジトリ**（例: `minna-yosegaki`）を作成し、`desu-mbti` とは分けて管理することを推奨します。
-
-## 技術スタック
-
-- Next.js (App Router) / TypeScript / Tailwind CSS / shadcn/ui
-- Supabase（PostgreSQL + Storage）
+```bash
+npm run build
+npm run start
+```

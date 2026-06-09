@@ -1,16 +1,13 @@
-export const SITE_NAME = "みんなの寄せ書き";
+export const SITE_NAME = "死生観診断";
 export const SITE_DESCRIPTION =
-  "ボタンひとつで寄せ書きページができ、メッセージと写真がみんなで集まります";
+  "死への情緒・死後の世界観・他者との距離・終末期のスタンスの4つの軸から、今のあなたの死生観を16タイプで診断します。";
 
 export function getSiteUrl(): string {
-  const url = process.env.NEXT_PUBLIC_SITE_URL;
-  if (url) return url.replace(/\/$/, "");
+  if (process.env.NEXT_PUBLIC_SITE_URL) {
+    return process.env.NEXT_PUBLIC_SITE_URL.replace(/\/$/, "");
+  }
   if (process.env.VERCEL_URL) {
     return `https://${process.env.VERCEL_URL}`;
   }
   return "http://localhost:3000";
-}
-
-export function getPublicPageUrl(pageId: string): string {
-  return `${getSiteUrl()}/pages/${pageId}`;
 }
