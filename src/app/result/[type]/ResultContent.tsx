@@ -4,10 +4,15 @@ import { useState } from "react";
 import Link from "next/link";
 import { DimensionBars } from "@/components/DimensionBars";
 import { ResultIllustration } from "@/components/ResultIllustration";
+import { SaveResultData } from "@/components/SaveResultData";
 import { ShareButtons } from "@/components/ShareButtons";
 import { getResult } from "@/data/results";
-import { loadStoredDiagnosis, useDiagnosis } from "@/context/DiagnosisContext";
-import type { DiagnosisScores, DiagnosisType } from "@/types/diagnosis";
+import {
+  loadStoredDiagnosis,
+  loadStoredResultRecord,
+  useDiagnosis,
+} from "@/context/DiagnosisContext";
+import type { DiagnosisResultRecord, DiagnosisScores, DiagnosisType } from "@/types/diagnosis";
 import { formatTypeDisplay } from "@/types/diagnosis";
 import { ResultResetButton } from "./ResultResetButton";
 
@@ -26,14 +31,28 @@ function pickScores(
   return null;
 }
 
+function pickRecord(
+  type: DiagnosisType,
+  fromContext: DiagnosisResultRecord | null,
+  fromStorage: DiagnosisResultRecord | null,
+): DiagnosisResultRecord | null {
+  if (fromContext?.result.type === type) return fromContext;
+  if (fromStorage?.result.type === type) return fromStorage;
+  return null;
+}
+
 export function ResultContent({ type, shareUrl }: ResultContentProps) {
   const result = getResult(type);
-  const { diagnosis } = useDiagnosis();
+  const { diagnosis, resultRecord } = useDiagnosis();
   const [storedScores] = useState<DiagnosisScores | null>(() =>
     loadStoredDiagnosis(),
   );
+  const [storedRecord] = useState<DiagnosisResultRecord | null>(() =>
+    loadStoredResultRecord(),
+  );
 
   const scores = pickScores(type, diagnosis, storedScores);
+  const record = pickRecord(type, resultRecord, storedRecord);
   const typeDisplay = scores?.typeDisplay ?? formatTypeDisplay(type);
   const shareText = `私の死生観診断の結果は「${result.name}（${typeDisplay}）」でした。${result.catchphrase}`;
 
@@ -101,6 +120,8 @@ export function ResultContent({ type, shareUrl }: ResultContentProps) {
         </p>
         <ShareButtons shareText={shareText} shareUrl={shareUrl} />
       </div>
+
+      {record && <SaveResultData record={record} />}
 
       <div className="mt-8 flex justify-center">
         <ResultResetButton />

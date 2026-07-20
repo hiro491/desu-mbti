@@ -57,6 +57,38 @@ export interface DiagnosisScores {
   typeDisplay: string;
 }
 
+export const DIAGNOSIS_SCHEMA_VERSION = 1 as const;
+
+export interface DiagnosisAnswerEntry {
+  questionId: string;
+  questionIndex: number;
+  questionText: string;
+  dimension: DimensionKey;
+  poleOnAgree: Question["poleOnAgree"];
+  reversed?: boolean;
+  value: AnswerValue;
+}
+
+export interface DiagnosisResultSummary {
+  type: DiagnosisType;
+  typeDisplay: string;
+  animal: string;
+  name: string;
+  catchphrase: string;
+}
+
+/** 診断結果の完全データ（回答・スコア・タイプ情報・タイムスタンプ） */
+export interface DiagnosisResultRecord {
+  schemaVersion: typeof DIAGNOSIS_SCHEMA_VERSION;
+  id: string;
+  startedAt: string;
+  completedAt: string;
+  disclaimerAccepted: boolean;
+  answers: DiagnosisAnswerEntry[];
+  scores: DiagnosisScores;
+  result: DiagnosisResultSummary;
+}
+
 export const DIAGNOSIS_TYPES: DiagnosisType[] = [
   "FSIT",
   "FSIN",

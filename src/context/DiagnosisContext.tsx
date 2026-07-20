@@ -13,12 +13,20 @@ import {
   getTotalPages,
   isPageComplete,
 } from "@/lib/question-pages";
+import { buildDiagnosisResultRecord } from "@/lib/diagnosis-record";
 import { computeDiagnosis } from "@/lib/scoring";
-import type { AnswerValue, DiagnosisScores, DiagnosisType } from "@/types/diagnosis";
+import type {
+  AnswerValue,
+  DiagnosisResultRecord,
+  DiagnosisScores,
+  DiagnosisType,
+} from "@/types/diagnosis";
 
 const ANSWERS_KEY = "desu-mbti-answers-v3";
 const RESULT_KEY = "desu-mbti-result-v3";
+const RECORD_KEY = "desu-mbti-record-v1";
 const PAGE_KEY = "desu-mbti-page-v3";
+const STARTED_AT_KEY = "desu-mbti-started-at-v1";
 
 interface DiagnosisContextValue {
   answers: (AnswerValue | undefined)[];
@@ -33,6 +41,7 @@ interface DiagnosisContextValue {
   isCurrentPageComplete: boolean;
   reset: () => void;
   diagnosis: DiagnosisScores | null;
+  resultRecord: DiagnosisResultRecord | null;
   resultType: DiagnosisType | null;
   isComplete: boolean;
 }
@@ -51,8 +60,62 @@ function saveDiagnosis(diagnosis: DiagnosisScores) {
   sessionStorage.setItem(RESULT_KEY, JSON.stringify(diagnosis));
 }
 
+function saveRecord(record: DiagnosisResultRecord) {
+  sessionStorage.setItem(RECORD_KEY, JSON.stringify(record));
+}
+
 function savePage(page: number) {
   sessionStorage.setItem(PAGE_KEY, String(page));
+}
+
+function getStartedAt(): string {
+  const existing = sessionStorage.getItem(STARTED_AT_KEY);
+  if (existing) return existing;
+  const startedAt = new Date().toISOString();
+  sessionStorage.setItem(STARTED_AT_KEY, startedAt);
+  return startedAt;
+}
+
+function clearSessionKeys() {
+  sessionStorage.removeItem(ANSWERS_KEY);
+  sessionStorage.removeItem(RESULT_KEY);
+  sessionStorage.removeItem(RECORD_KEY);
+  sessionStorage.removeItem(PAGE_KEY);
+  sessionStorage.removeItem(STARTED_AT_KEY);
+}
+
+function readStoredRecord(): DiagnosisResultRecord | null {
+  if (typeof window === "undefined") return null;
+  try {
+    const raw = sessionStorage.getItem(RECORD_KEY);
+    if (!raw) return null;
+    return JSON.parse(raw) as DiagnosisResultRecord;
+  } catch {
+    return null;
+  }
+}
+
+function persistCompletedRecord(
+  answers: (AnswerValue | undefined)[],
+  disclaimerAccepted: boolean,
+): DiagnosisResultRecord | null {
+  const diagnosis = computeDiagnosis(answers);
+  if (!diagnosis) return null;
+
+  const existing = readStoredRecord();
+  const record = buildDiagnosisResultRecord(answers, {
+    startedAt: getStartedAt(),
+    completedAt: existing?.completedAt,
+    disclaimerAccepted,
+    scores: diagnosis,
+    id: existing?.id,
+  });
+
+  if (!record) return null;
+
+  saveDiagnosis(diagnosis);
+  saveRecord(record);
+  return record;
 }
 
 export function DiagnosisProvider({ children }: { children: ReactNode }) {
@@ -65,6 +128,7 @@ export function DiagnosisProvider({ children }: { children: ReactNode }) {
   const totalPages = getTotalPages();
 
   const acceptDisclaimer = useCallback(() => {
+    getStartedAt();
     setDisclaimerAccepted(true);
   }, []);
 
@@ -73,8 +137,7 @@ export function DiagnosisProvider({ children }: { children: ReactNode }) {
       const next = [...prev];
       next[index] = value;
       saveAnswers(next);
-      const diagnosis = computeDiagnosis(next);
-      if (diagnosis) saveDiagnosis(diagnosis);
+      persistCompletedRecord(next, true);
       return next;
     });
   }, []);
@@ -99,12 +162,21 @@ export function DiagnosisProvider({ children }: { children: ReactNode }) {
     setAnswers(emptyAnswers());
     setCurrentPage(0);
     setDisclaimerAccepted(false);
-    sessionStorage.removeItem(ANSWERS_KEY);
-    sessionStorage.removeItem(RESULT_KEY);
-    sessionStorage.removeItem(PAGE_KEY);
+    clearSessionKeys();
   }, []);
 
   const diagnosis = useMemo(() => computeDiagnosis(answers), [answers]);
+
+  const resultRecord = useMemo(() => {
+    if (!diagnosis) return null;
+    const stored = readStoredRecord();
+    if (stored) return stored;
+    return buildDiagnosisResultRecord(answers, {
+      startedAt: getStartedAt(),
+      disclaimerAccepted,
+      scores: diagnosis,
+    });
+  }, [answers, disclaimerAccepted, diagnosis]);
 
   const isComplete = useMemo(
     () => answers.every((a) => a !== undefined),
@@ -130,6 +202,7 @@ export function DiagnosisProvider({ children }: { children: ReactNode }) {
       isCurrentPageComplete,
       reset,
       diagnosis,
+      resultRecord,
       resultType: diagnosis?.type ?? null,
       isComplete,
     }),
@@ -145,6 +218,7 @@ export function DiagnosisProvider({ children }: { children: ReactNode }) {
       isCurrentPageComplete,
       reset,
       diagnosis,
+      resultRecord,
       isComplete,
     ],
   );
@@ -170,6 +244,17 @@ export function loadStoredDiagnosis(): DiagnosisScores | null {
     const raw = sessionStorage.getItem(RESULT_KEY);
     if (!raw) return null;
     return JSON.parse(raw) as DiagnosisScores;
+  } catch {
+    return null;
+  }
+}
+
+export function loadStoredResultRecord(): DiagnosisResultRecord | null {
+  if (typeof window === "undefined") return null;
+  try {
+    const raw = sessionStorage.getItem(RECORD_KEY);
+    if (!raw) return null;
+    return JSON.parse(raw) as DiagnosisResultRecord;
   } catch {
     return null;
   }
