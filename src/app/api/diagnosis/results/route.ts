@@ -16,10 +16,9 @@ export async function GET() {
     });
   } catch (error) {
     console.error("Failed to list diagnosis records:", error);
-    return NextResponse.json(
-      { error: "診断結果データの取得に失敗しました。" },
-      { status: 500 },
-    );
+    const message =
+      error instanceof Error ? error.message : "診断結果データの取得に失敗しました。";
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }
 

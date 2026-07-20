@@ -9,14 +9,16 @@ export async function listDiagnosisRecordsFromFirestore(): Promise<
   DiagnosisResultRecord[]
 > {
   const db = getFirestoreDb();
-  const snapshot = await db
-    .collection(getDiagnosisCollectionName())
-    .orderBy("completedAt", "desc")
-    .get();
+  const snapshot = await db.collection(getDiagnosisCollectionName()).get();
 
   return snapshot.docs
     .map((doc) => doc.data())
-    .filter(isDiagnosisResultRecord);
+    .filter(isDiagnosisResultRecord)
+    .sort(
+      (a, b) =>
+        new Date(b.completedAt).getTime() -
+        new Date(a.completedAt).getTime(),
+    );
 }
 
 export async function saveDiagnosisRecordToFirestore(

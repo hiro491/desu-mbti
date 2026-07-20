@@ -83,7 +83,8 @@ export function getFirestoreDb(): Firestore {
         credential: cert(credentials),
       });
     }
-    firestore = getFirestore();
+    const databaseId = process.env.FIRESTORE_DATABASE_ID ?? "(default)";
+    firestore = getFirestore(getApps()[0], databaseId);
   }
 
   return firestore;
