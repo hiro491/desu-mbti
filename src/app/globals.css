@@ -1,4 +1,10 @@
 @import "tailwindcss";
+@import "@fontsource/zen-kaku-gothic-new/japanese-400.css";
+@import "@fontsource/zen-kaku-gothic-new/japanese-500.css";
+@import "@fontsource/zen-kaku-gothic-new/japanese-700.css";
+@import "@fontsource/shippori-mincho/japanese-400.css";
+@import "@fontsource/shippori-mincho/japanese-600.css";
+@import "@fontsource/shippori-mincho/japanese-700.css";
 
 :root {
   --dawn-bg: #ffffff;
@@ -13,6 +19,8 @@
   --dawn-accent-soft: rgba(74, 144, 143, 0.12);
   --dawn-lavender: #8e7cc3;
   --dawn-neutral: #9ca3af;
+  --font-sans: "Zen Kaku Gothic New", "Hiragino Sans", "Yu Gothic UI", sans-serif;
+  --font-display: "Shippori Mincho", "Hiragino Mincho ProN", serif;
 }
 
 @theme inline {
@@ -31,13 +39,13 @@
   --color-dawn-neutral: var(--dawn-neutral);
 }
 
+.font-display {
+  font-family: var(--font-display);
+}
+
 body {
   background: #ffffff;
   color: var(--dawn-text);
-  font-family:
-    "Hiragino Maru Gothic ProN",
-    "Hiragino Sans",
-    "Yu Gothic UI",
-    "Meiryo",
-    sans-serif;
+  font-family: var(--font-sans);
+  letter-spacing: 0.02em;
 }

@@ -28,7 +28,7 @@ add_env() {
   echo "設定済み: $name"
 }
 
-add_env "NEXT_PUBLIC_SITE_URL" "https://desu-mbti.vercel.app"
+add_env "NEXT_PUBLIC_SITE_URL" "https://deathtype.death-tech.org"
 add_env "FIREBASE_PROJECT_ID" "dethtype"
 add_env "FIREBASE_CLIENT_EMAIL" "firebase-adminsdk-fbsvc@dethtype.iam.gserviceaccount.com"
 add_env "FIREBASE_SERVICE_ACCOUNT_JSON" "$SERVICE_ACCOUNT_JSON"

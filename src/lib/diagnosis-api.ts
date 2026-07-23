@@ -25,25 +25,3 @@ export async function saveDiagnosisRecordToServer(
     return { ok: false, error: "サーバーへの接続に失敗しました。" };
   }
 }
-
-export async function fetchAllDiagnosisRecords(): Promise<{
-  records: DiagnosisResultRecord[];
-  storage: "firestore" | "file";
-}> {
-  const response = await fetch("/api/diagnosis/results", {
-    cache: "no-store",
-  });
-
-  if (!response.ok) {
-    throw new Error("診断結果データの取得に失敗しました。");
-  }
-
-  const data = (await response.json()) as {
-    records: DiagnosisResultRecord[];
-    storage?: "firestore" | "file";
-  };
-  return {
-    records: data.records ?? [],
-    storage: data.storage ?? "file",
-  };
-}

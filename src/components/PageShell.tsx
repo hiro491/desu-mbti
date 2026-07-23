@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { SITE_NAME } from "@/lib/site";
 
 interface PageShellProps {
   children: ReactNode;
@@ -27,8 +28,8 @@ export function PageShell({
       />
       <main className={mainClass}>
         <header className="mb-6 shrink-0 text-center">
-          <h1 className="text-xl font-bold tracking-wide text-dawn-navy-deep sm:text-2xl">
-            死生観診断
+          <h1 className="font-display text-xl font-bold tracking-[0.2em] text-dawn-navy-deep sm:text-2xl">
+            {SITE_NAME}
           </h1>
           {layout === "center" && (
             <p className="mt-1 text-xs text-dawn-muted">

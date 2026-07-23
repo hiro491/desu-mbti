@@ -2,25 +2,8 @@ import { NextResponse } from "next/server";
 import { isDiagnosisResultRecord } from "@/lib/diagnosis-record";
 import {
   getDiagnosisStorageBackend,
-  listDiagnosisRecords,
   saveDiagnosisRecord,
 } from "@/lib/server/diagnosis-store";
-
-export async function GET() {
-  try {
-    const records = await listDiagnosisRecords();
-    return NextResponse.json({
-      records,
-      count: records.length,
-      storage: getDiagnosisStorageBackend(),
-    });
-  } catch (error) {
-    console.error("Failed to list diagnosis records:", error);
-    const message =
-      error instanceof Error ? error.message : "診断結果データの取得に失敗しました。";
-    return NextResponse.json({ error: message }, { status: 500 });
-  }
-}
 
 export async function POST(request: Request) {
   try {
@@ -32,9 +15,9 @@ export async function POST(request: Request) {
       );
     }
 
-    const saved = await saveDiagnosisRecord(body);
+    await saveDiagnosisRecord(body);
     return NextResponse.json(
-      { record: saved, storage: getDiagnosisStorageBackend() },
+      { ok: true, storage: getDiagnosisStorageBackend() },
       { status: 201 },
     );
   } catch (error) {

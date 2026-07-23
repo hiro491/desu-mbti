@@ -1,10 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { DimensionBars } from "@/components/DimensionBars";
 import { ResultIllustration } from "@/components/ResultIllustration";
-import { SaveResultData } from "@/components/SaveResultData";
 import { ShareButtons } from "@/components/ShareButtons";
 import { getResult } from "@/data/results";
 import {
@@ -12,6 +11,7 @@ import {
   loadStoredResultRecord,
   useDiagnosis,
 } from "@/context/DiagnosisContext";
+import { saveDiagnosisRecordToServer } from "@/lib/diagnosis-api";
 import type { DiagnosisResultRecord, DiagnosisScores, DiagnosisType } from "@/types/diagnosis";
 import { formatTypeDisplay } from "@/types/diagnosis";
 import { ResultResetButton } from "./ResultResetButton";
@@ -54,13 +54,18 @@ export function ResultContent({ type, shareUrl }: ResultContentProps) {
   const scores = pickScores(type, diagnosis, storedScores);
   const record = pickRecord(type, resultRecord, storedRecord);
   const typeDisplay = scores?.typeDisplay ?? formatTypeDisplay(type);
-  const shareText = `私の死生観診断の結果は「${result.name}（${typeDisplay}）」でした。${result.catchphrase}`;
+  const shareText = `私のデスタイプ診断の結果は「${result.name}（${typeDisplay}）」でした。${result.catchphrase}`;
+
+  useEffect(() => {
+    if (!record) return;
+    void saveDiagnosisRecordToServer(record);
+  }, [record]);
 
   return (
     <section className="rounded-2xl border border-dawn-border bg-dawn-card p-6 shadow-sm sm:p-8">
       <p className="text-center text-xs text-dawn-muted">あなたのタイプ</p>
       <ResultIllustration type={type} />
-      <p className="mt-4 text-center text-2xl font-bold tracking-widest text-dawn-accent sm:text-3xl">
+      <p className="mt-4 text-center text-2xl font-bold tracking-[0.18em] text-dawn-accent sm:text-3xl font-display">
         {typeDisplay}
       </p>
       <h2 className="mt-2 text-center text-xl font-semibold">
@@ -120,8 +125,6 @@ export function ResultContent({ type, shareUrl }: ResultContentProps) {
         </p>
         <ShareButtons shareText={shareText} shareUrl={shareUrl} />
       </div>
-
-      {record && <SaveResultData record={record} />}
 
       <div className="mt-8 flex justify-center">
         <ResultResetButton />
