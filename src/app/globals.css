@@ -2,9 +2,6 @@
 @import "@fontsource/zen-kaku-gothic-new/japanese-400.css";
 @import "@fontsource/zen-kaku-gothic-new/japanese-500.css";
 @import "@fontsource/zen-kaku-gothic-new/japanese-700.css";
-@import "@fontsource/shippori-mincho/japanese-400.css";
-@import "@fontsource/shippori-mincho/japanese-600.css";
-@import "@fontsource/shippori-mincho/japanese-700.css";
 
 :root {
   --dawn-bg: #ffffff;
@@ -14,13 +11,12 @@
   --dawn-muted: #444444;
   --dawn-border: #d1d5db;
   --dawn-navy-deep: #1a1a1a;
-  --dawn-accent: #4a908f;
-  --dawn-accent-light: #3d7a79;
-  --dawn-accent-soft: rgba(74, 144, 143, 0.12);
-  --dawn-lavender: #8e7cc3;
+  --dawn-accent: #6b7280;
+  --dawn-accent-light: #4b5563;
+  --dawn-accent-soft: rgba(107, 114, 128, 0.12);
+  --dawn-lavender: #9ca3af;
   --dawn-neutral: #9ca3af;
   --font-sans: "Zen Kaku Gothic New", "Hiragino Sans", "Yu Gothic UI", sans-serif;
-  --font-display: "Shippori Mincho", "Hiragino Mincho ProN", serif;
 }
 
 @theme inline {
@@ -39,13 +35,29 @@
   --color-dawn-neutral: var(--dawn-neutral);
 }
 
-.font-display {
-  font-family: var(--font-display);
-}
-
 body {
   background: #ffffff;
   color: var(--dawn-text);
   font-family: var(--font-sans);
   letter-spacing: 0.02em;
+}
+
+.btn-gray {
+  background-color: #6b7280;
+  color: #ffffff;
+  transition: background-color 0.15s ease, transform 0.1s ease;
+}
+
+.btn-gray:hover {
+  background-color: #4b5563;
+  color: #ffffff;
+}
+
+.btn-gray:active {
+  transform: scale(0.98);
+}
+
+a.btn-gray,
+button.btn-gray {
+  color: #ffffff;
 }

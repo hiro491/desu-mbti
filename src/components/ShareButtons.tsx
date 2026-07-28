@@ -18,7 +18,7 @@ export function ShareButtons({ shareText, shareUrl }: ShareButtonsProps) {
         href={xUrl}
         target="_blank"
         rel="noopener noreferrer"
-        className="inline-flex items-center justify-center gap-2 rounded-xl bg-dawn-surface px-5 py-3 text-sm font-medium text-dawn-text transition hover:bg-dawn-border"
+        className="btn-gray inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-medium"
       >
         <span aria-hidden>𝕏</span>
         Xでシェア
@@ -27,7 +27,7 @@ export function ShareButtons({ shareText, shareUrl }: ShareButtonsProps) {
         href={lineUrl}
         target="_blank"
         rel="noopener noreferrer"
-        className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#06C755] px-5 py-3 text-sm font-medium text-white transition-opacity hover:opacity-90"
+        className="btn-gray inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-medium"
       >
         LINEでシェア
       </a>

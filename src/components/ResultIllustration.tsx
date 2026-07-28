@@ -10,16 +10,16 @@ interface ResultIllustrationProps {
 }
 
 export function ResultIllustration({ type }: ResultIllustrationProps) {
-  const { animal, name, imagePath } = getResult(type);
+  const { flower, name, imagePath } = getResult(type);
   const [imgError, setImgError] = useState(false);
 
   return (
     <div className="mx-auto w-full max-w-[240px]">
-      <div className="relative aspect-square overflow-hidden rounded-2xl border border-dawn-border bg-dawn-accent-soft/30">
+      <div className="relative aspect-square overflow-hidden rounded-2xl border border-dawn-border bg-gray-50">
         {!imgError && (
           <Image
             src={imagePath}
-            alt={`${name}（${animal}）のキャラクターイラスト`}
+            alt={`${name}（${flower}）のイラスト`}
             fill
             className="object-cover"
             sizes="240px"
@@ -29,10 +29,10 @@ export function ResultIllustration({ type }: ResultIllustrationProps) {
         {imgError && (
           <div className="absolute inset-0 flex flex-col items-center justify-center p-4 text-center">
             <p className="text-4xl" aria-hidden>
-              🐾
+              🌸
             </p>
-            <p className="mt-2 text-lg font-semibold text-dawn-accent">
-              {animal}
+            <p className="mt-2 text-lg font-semibold text-dawn-text">
+              {flower}
             </p>
             <p className="mt-1 text-xs text-dawn-muted">イラスト準備中</p>
           </div>

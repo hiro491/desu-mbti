@@ -36,6 +36,10 @@ export interface Question {
   dimension: DimensionKey;
   poleOnAgree: EmotionPole | CognitionPole | RelationPole | ActionPole;
   reversed?: boolean;
+  /** 集計対象外（アテンションチェック等） */
+  excludeFromScoring?: boolean;
+  /** アテンションチェックの正答（指定時のみ結果遷移前に検証） */
+  attentionCheckAnswer?: AnswerValue;
 }
 
 export interface DimensionPercentages {
@@ -72,7 +76,7 @@ export interface DiagnosisAnswerEntry {
 export interface DiagnosisResultSummary {
   type: DiagnosisType;
   typeDisplay: string;
-  animal: string;
+  flower: string;
   name: string;
   catchphrase: string;
 }

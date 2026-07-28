@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { DimensionBars } from "@/components/DimensionBars";
+import { ResultDetailSections } from "@/components/ResultDetailSections";
 import { ResultIllustration } from "@/components/ResultIllustration";
 import { ShareButtons } from "@/components/ShareButtons";
 import { getResult } from "@/data/results";
@@ -14,6 +15,7 @@ import {
 import { saveDiagnosisRecordToServer } from "@/lib/diagnosis-api";
 import type { DiagnosisResultRecord, DiagnosisScores, DiagnosisType } from "@/types/diagnosis";
 import { formatTypeDisplay } from "@/types/diagnosis";
+import { HighlightText, SectionTitle } from "@/components/ResultText";
 import { ResultResetButton } from "./ResultResetButton";
 
 interface ResultContentProps {
@@ -41,6 +43,13 @@ function pickRecord(
   return null;
 }
 
+function scrollToDetail() {
+  document.getElementById("result-detail")?.scrollIntoView({
+    behavior: "smooth",
+    block: "start",
+  });
+}
+
 export function ResultContent({ type, shareUrl }: ResultContentProps) {
   const result = getResult(type);
   const { diagnosis, resultRecord } = useDiagnosis();
@@ -65,16 +74,16 @@ export function ResultContent({ type, shareUrl }: ResultContentProps) {
     <section className="rounded-2xl border border-dawn-border bg-dawn-card p-6 shadow-sm sm:p-8">
       <p className="text-center text-xs text-dawn-muted">あなたのタイプ</p>
       <ResultIllustration type={type} />
-      <p className="mt-4 text-center text-2xl font-bold tracking-[0.18em] text-dawn-accent sm:text-3xl font-display">
+      <p className="mt-4 text-center text-2xl font-bold tracking-[0.18em] text-dawn-text sm:text-3xl">
         {typeDisplay}
       </p>
-      <h2 className="mt-2 text-center text-xl font-semibold">
+      <h2 className="mt-2 text-center text-xl font-semibold text-dawn-text">
         {result.name}
       </h2>
       <p className="mt-1 text-center text-xs text-dawn-muted">
-        {result.animal}タイプ
+        {result.flower}タイプ
       </p>
-      <p className="mt-3 text-center text-sm italic text-dawn-muted">
+      <p className="mt-4 rounded-lg border border-dawn-border bg-gray-50 px-4 py-3 text-center text-sm font-bold leading-relaxed text-dawn-text">
         {result.catchphrase}
       </p>
 
@@ -84,40 +93,35 @@ export function ResultContent({ type, shareUrl }: ResultContentProps) {
         </div>
       )}
 
-      <div className="mt-6 space-y-5 border-t border-dawn-border pt-6">
-        <div>
-          <h3 className="text-xs font-bold tracking-widest text-dawn-accent">
-            概要
-          </h3>
-          <p className="mt-2 text-sm leading-relaxed">{result.summary}</p>
-        </div>
-        <div>
-          <h3 className="text-xs font-bold tracking-widest text-dawn-accent">
-            特徴
-          </h3>
-          <p className="mt-2 text-sm leading-relaxed">{result.traits}</p>
-        </div>
-        <div>
-          <h3 className="text-xs font-bold tracking-widest text-dawn-accent">
-            向いている終活
-          </h3>
-          <p className="mt-2 text-sm font-medium leading-relaxed text-dawn-accent-light">
-            {result.suitableEndOfLife}
+      <div className="mt-6 space-y-4 border-t border-dawn-border pt-6">
+        <div className="rounded-xl border border-dawn-border bg-white p-4 sm:p-5">
+          <SectionTitle>基本情報</SectionTitle>
+          <p className="mt-4 text-sm leading-7 text-dawn-text">
+            <HighlightText text={result.basicInfo} />
           </p>
         </div>
-        <div>
-          <h3 className="text-xs font-bold tracking-widest text-dawn-accent">
-            相性の良いタイプ
-          </h3>
-          <p className="mt-2 text-sm leading-relaxed">{result.compatibleTypes}</p>
+
+        <div className="rounded-xl border border-dawn-border bg-gray-50 px-4 py-3 text-center sm:px-5">
+          <p className="text-xs font-bold tracking-widest text-dawn-text underline decoration-gray-400 decoration-2 underline-offset-4">
+            花言葉
+          </p>
+          <p className="mt-2 text-sm font-bold text-dawn-text">
+            {result.flowerLanguage}
+          </p>
         </div>
-        <div>
-          <h3 className="text-xs font-bold tracking-widest text-dawn-accent">
-            より良く生きるヒント
-          </h3>
-          <p className="mt-2 text-sm leading-relaxed">{result.livingHint}</p>
+
+        <div className="flex justify-center pt-2">
+          <button
+            type="button"
+            onClick={scrollToDetail}
+            className="btn-gray rounded-xl px-6 py-3 text-sm font-bold shadow-sm"
+          >
+            詳しく診断結果を見る
+          </button>
         </div>
       </div>
+
+      <ResultDetailSections result={result} />
 
       <div className="mt-8">
         <p className="mb-3 text-center text-xs text-dawn-muted">

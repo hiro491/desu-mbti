@@ -51,7 +51,7 @@ export function buildDiagnosisResultRecord(
     result: {
       type: result.type,
       typeDisplay: scores.typeDisplay,
-      animal: result.animal,
+      flower: result.flower,
       name: result.name,
       catchphrase: result.catchphrase,
     },

@@ -10,7 +10,7 @@ export function ResultResetButton() {
     <Link
       href="/question"
       onClick={() => reset()}
-      className="inline-flex items-center justify-center rounded-xl border border-dawn-border bg-transparent px-6 py-3 text-sm font-medium text-dawn-muted transition hover:border-dawn-muted hover:text-dawn-text"
+      className="btn-gray inline-flex items-center justify-center rounded-xl px-6 py-3 text-sm font-medium"
     >
       トップに戻る（もう一度診断する）
     </Link>

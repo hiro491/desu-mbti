@@ -103,6 +103,7 @@ export function computeRawScores(
   };
 
   questions.forEach((q, i) => {
+    if (q.excludeFromScoring) return;
     const value = answers[i];
     if (value === undefined) return;
     const weight = centeredWeight(value, q.reversed);

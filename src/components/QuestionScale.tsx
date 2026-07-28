@@ -16,13 +16,13 @@ const LABELS: Record<AnswerValue, string> = {
 };
 
 const SIZES: Record<AnswerValue, string> = {
-  7: "h-10 w-10",
+  7: "h-9 w-9 sm:h-10 sm:w-10",
   6: "h-8 w-8",
   5: "h-7 w-7",
-  4: "h-5 w-5",
+  4: "h-5 w-5 sm:h-6 sm:w-6",
   3: "h-7 w-7",
   2: "h-8 w-8",
-  1: "h-10 w-10",
+  1: "h-9 w-9 sm:h-10 sm:w-10",
 };
 
 interface QuestionScaleProps {
@@ -32,30 +32,14 @@ interface QuestionScaleProps {
 
 export function QuestionScale({ selected, onSelect }: QuestionScaleProps) {
   return (
-    <div className="mt-4">
-      <div className="flex items-center justify-between gap-1 sm:gap-2">
+    <div className="mt-4 px-1">
+      <div className="grid grid-cols-7 items-center gap-1 sm:gap-2">
         {VALUES.map((value) => {
-          const isAgree = value > 4;
-          const isDisagree = value < 4;
-          const isNeutral = value === 4;
           const isSelected = selected === value;
 
-          let ring =
-            "border-2 border-dawn-neutral bg-gray-100 hover:border-gray-500";
-          if (isSelected) {
-            if (isAgree) ring = "border-2 border-dawn-accent bg-dawn-accent scale-110";
-            else if (isDisagree)
-              ring = "border-2 border-dawn-lavender bg-dawn-lavender scale-110";
-            else ring = "border-2 border-gray-500 bg-gray-400 scale-110";
-          } else if (isAgree) {
-            ring =
-              "border-2 border-dawn-accent bg-dawn-accent/20 hover:bg-dawn-accent/35";
-          } else if (isDisagree) {
-            ring =
-              "border-2 border-dawn-lavender bg-dawn-lavender/20 hover:bg-dawn-lavender/35";
-          } else if (isNeutral) {
-            ring = "border-2 border-gray-400 bg-gray-100 hover:border-gray-500";
-          }
+          const ring = isSelected
+            ? "border-2 border-gray-600 bg-gray-500 ring-2 ring-gray-300 ring-offset-1"
+            : "border-2 border-gray-300 bg-gray-100 hover:border-gray-500 hover:bg-gray-200";
 
           return (
             <button
@@ -64,14 +48,14 @@ export function QuestionScale({ selected, onSelect }: QuestionScaleProps) {
               onClick={() => onSelect(value)}
               aria-label={LABELS[value]}
               aria-pressed={isSelected}
-              className={`shrink-0 rounded-full transition-all active:scale-95 ${SIZES[value]} ${ring}`}
+              className={`mx-auto rounded-full transition-colors active:scale-95 ${SIZES[value]} ${ring}`}
             />
           );
         })}
       </div>
-      <div className="mt-2.5 flex justify-between text-xs font-semibold sm:text-sm">
-        <span className="text-dawn-accent">そう思う</span>
-        <span className="text-dawn-lavender">そう思わない</span>
+      <div className="mt-2.5 flex justify-between px-0.5 text-xs font-semibold text-gray-600 sm:text-sm">
+        <span>そう思う</span>
+        <span>そう思わない</span>
       </div>
     </div>
   );

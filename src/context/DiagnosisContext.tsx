@@ -22,10 +22,10 @@ import type {
   DiagnosisType,
 } from "@/types/diagnosis";
 
-const ANSWERS_KEY = "desu-mbti-answers-v3";
-const RESULT_KEY = "desu-mbti-result-v3";
-const RECORD_KEY = "desu-mbti-record-v1";
-const PAGE_KEY = "desu-mbti-page-v3";
+const ANSWERS_KEY = "desu-mbti-answers-v5";
+const RESULT_KEY = "desu-mbti-result-v5";
+const RECORD_KEY = "desu-mbti-record-v3";
+const PAGE_KEY = "desu-mbti-page-v5";
 const STARTED_AT_KEY = "desu-mbti-started-at-v1";
 
 interface DiagnosisContextValue {

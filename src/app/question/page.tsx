@@ -108,7 +108,7 @@ export default function QuestionPage() {
           <button
             type="button"
             onClick={goPrevPage}
-            className="shrink-0 text-xs font-medium text-dawn-accent hover:text-dawn-accent-light"
+            className="shrink-0 text-xs font-medium text-gray-600 hover:text-gray-800"
           >
             ← 前のページ
           </button>
@@ -120,7 +120,7 @@ export default function QuestionPage() {
 
       <div
         ref={listRef}
-        className="min-h-0 flex-1 space-y-8 overflow-y-auto pb-28"
+        className="min-h-0 flex-1 space-y-8 overflow-y-auto overflow-x-hidden pb-28"
       >
         {pageIndices.map((index) => {
           const question = questions[index];
@@ -143,16 +143,16 @@ export default function QuestionPage() {
       </div>
 
       <div className="fixed inset-x-0 bottom-0 z-20 border-t border-dawn-border bg-white/95 px-5 py-4 backdrop-blur-sm sm:px-6">
-        <div className="mx-auto max-w-lg">
+        <div className="mx-auto max-w-xl">
           {showIncompleteHint && (
-            <p className="mb-2 text-center text-xs text-dawn-lavender">
+            <p className="mb-2 text-center text-xs text-gray-500">
               未回答の質問があります。すべて選んでから進んでください。
             </p>
           )}
           <button
             type="button"
             onClick={handleNext}
-            className="w-full rounded-xl bg-dawn-accent py-3.5 text-sm font-bold text-white transition hover:bg-dawn-accent-light active:scale-[0.98]"
+            className="btn-gray w-full rounded-xl py-3.5 text-sm font-bold"
           >
             {isLastPage ? "結果を見る" : "次のページへ"}
           </button>

@@ -32,7 +32,7 @@ export async function generateMetadata({
   const pageUrl = `${siteUrl}/result/${type}`;
   const display = formatTypeDisplay(type);
   const ogTitle = `${result.name}（${display}）| ${SITE_NAME}`;
-  const ogDescription = `${result.catchphrase} — ${result.suitableEndOfLife}`;
+  const ogDescription = `${result.catchphrase} — ${result.basicInfo}`;
 
   return {
     title: `${result.name}（${display}）`,

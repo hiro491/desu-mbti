@@ -28,7 +28,7 @@ export function DisclaimerGate({ onAccept }: DisclaimerGateProps) {
       <button
         type="button"
         onClick={onAccept}
-        className="mt-8 w-full rounded-xl bg-dawn-accent py-3.5 text-sm font-bold text-white transition hover:bg-dawn-accent-light active:scale-[0.98]"
+        className="btn-gray mt-8 w-full rounded-xl py-3.5 text-sm font-bold"
       >
         内容を理解したうえで診断を始める
       </button>

@@ -14,8 +14,8 @@ export function PageShell({
 }: PageShellProps) {
   const mainClass =
     layout === "scroll"
-      ? "relative z-10 mx-auto flex h-dvh w-full max-w-lg flex-col overflow-hidden px-5 py-6 sm:px-6"
-      : "relative z-10 mx-auto flex min-h-screen max-w-lg flex-col justify-center px-5 py-10 sm:px-6";
+      ? "relative z-10 mx-auto flex h-dvh w-full max-w-xl flex-col overflow-x-hidden overflow-y-hidden px-4 py-6 sm:px-6"
+      : "relative z-10 mx-auto flex min-h-screen max-w-xl flex-col justify-center px-4 py-10 sm:px-6";
 
   return (
     <div className="relative min-h-screen bg-white text-dawn-text">
@@ -28,7 +28,7 @@ export function PageShell({
       />
       <main className={mainClass}>
         <header className="mb-6 shrink-0 text-center">
-          <h1 className="font-display text-xl font-bold tracking-[0.2em] text-dawn-navy-deep sm:text-2xl">
+          <h1 className="text-xl font-bold tracking-[0.2em] text-dawn-navy-deep sm:text-2xl">
             {SITE_NAME}
           </h1>
           {layout === "center" && (
