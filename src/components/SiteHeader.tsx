@@ -24,7 +24,7 @@ export function SiteHeader() {
 
   return (
     <header className="sticky top-0 z-30 border-b border-dawn-border bg-white">
-      <div className="mx-auto flex h-14 max-w-6xl items-center justify-between gap-6 px-4 sm:h-16 sm:px-6">
+      <div className="flex h-14 w-full items-center justify-between gap-4 px-2 sm:h-16 sm:px-4 lg:px-6">
         <a
           href={ASSOCIATION_URL}
           target="_blank"
