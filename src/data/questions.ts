@@ -76,8 +76,9 @@ export const questions: Question[] = [
   {
     id: "q13",
     dimension: "FA",
-    poleOnAgree: "F",
-    text: "老いや病気のことを考えると、将来への漠然とした不安が押し寄せてくる。",
+    poleOnAgree: "A",
+    excludeFromScoring: true,
+    text: "ここまでの質問に、落ち着いて答えられましたか。",
   },
   {
     id: "q14",

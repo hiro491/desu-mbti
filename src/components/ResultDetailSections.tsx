@@ -1,68 +1,91 @@
 "use client";
 
 import type { TypeResult } from "@/data/results/types";
-import { HighlightText, SectionTitle } from "@/components/ResultText";
+import { HighlightText } from "@/components/ResultText";
+import { ResultSectionHeader } from "@/components/ResultSectionHeader";
 
-function Section({
-  title,
+function ResultCard({
   children,
+  className = "",
 }: {
-  title: string;
   children: React.ReactNode;
+  className?: string;
 }) {
   return (
-    <section className="rounded-xl border border-dawn-border bg-white p-4 sm:p-5">
-      <SectionTitle>{title}</SectionTitle>
-      <div className="mt-4 text-sm leading-7 text-dawn-text">{children}</div>
-    </section>
+    <div
+      className={`rounded-xl bg-white p-5 shadow-sm sm:p-6 ${className}`}
+    >
+      {children}
+    </div>
   );
 }
 
-export function ResultDetailSections({ result }: { result: TypeResult }) {
-  return (
-    <div id="result-detail" className="mt-6 space-y-4 scroll-mt-6">
-      <Section title="表の顔">
-        <p>
-          <HighlightText text={result.publicFace} />
-        </p>
-      </Section>
+interface ResultDetailSectionsProps {
+  result: TypeResult;
+  startNumber?: number;
+}
 
-      <Section title="裏の顔">
-        <p>
-          <HighlightText text={result.privateFace} />
-        </p>
-      </Section>
-
-      <Section title="家族と対話するためのヒント">
-        <p>
-          <HighlightText text={result.familyDialogueHint} />
-        </p>
-      </Section>
-
-      <Section title="向いている終活">
+export function ResultDetailSections({
+  result,
+  startNumber = 3,
+}: ResultDetailSectionsProps) {
+  const sections = [
+    {
+      title: "表の顔",
+      content: <HighlightText text={result.publicFace} />,
+    },
+    {
+      title: "裏の顔",
+      content: <HighlightText text={result.privateFace} />,
+    },
+    {
+      title: "家族と対話するためのヒント",
+      content: <HighlightText text={result.familyDialogueHint} />,
+    },
+    {
+      title: "向いている終活",
+      content: (
         <ul className="list-disc space-y-3 pl-5">
           {result.endOfLifeSteps.map((step, index) => (
-            <li key={index} className="leading-7">
+            <li key={index} className="leading-7 text-dawn-text">
               <HighlightText text={step.text} />
             </li>
           ))}
         </ul>
-      </Section>
-
-      <Section title="死生観の構成">
-        <ul className="space-y-4">
+      ),
+    },
+    {
+      title: "死生観の構成",
+      content: (
+        <ul className="space-y-5">
           {result.worldview.map((item) => (
-            <li key={item.label} className="border-b border-dawn-border/60 pb-4 last:border-b-0 last:pb-0">
-              <p className="font-bold underline decoration-gray-400 decoration-2 underline-offset-4">
-                {item.label}
-              </p>
-              <p className="mt-2">
+            <li key={item.label}>
+              <p className="font-bold text-azuki">{item.label}</p>
+              <p className="mt-2 leading-7 text-dawn-text">
                 <HighlightText text={item.text} />
               </p>
             </li>
           ))}
         </ul>
-      </Section>
+      ),
+    },
+  ];
+
+  return (
+    <div id="result-detail" className="space-y-10 scroll-mt-6">
+      {sections.map((section, index) => (
+        <section key={section.title}>
+          <ResultSectionHeader
+            number={startNumber + index}
+            title={section.title}
+          />
+          <ResultCard>
+            <div className="text-sm leading-7 text-dawn-text sm:text-base">
+              {section.content}
+            </div>
+          </ResultCard>
+        </section>
+      ))}
     </div>
   );
 }

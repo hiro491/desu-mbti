@@ -7,22 +7,34 @@ import type { DiagnosisType } from "@/types/diagnosis";
 
 interface ResultIllustrationProps {
   type: DiagnosisType;
+  variant?: "default" | "hero";
 }
 
-export function ResultIllustration({ type }: ResultIllustrationProps) {
+export function ResultIllustration({
+  type,
+  variant = "default",
+}: ResultIllustrationProps) {
   const { flower, name, imagePath } = getResult(type);
   const [imgError, setImgError] = useState(false);
 
+  const isHero = variant === "hero";
+
   return (
-    <div className="mx-auto w-full max-w-[240px]">
-      <div className="relative aspect-square overflow-hidden rounded-2xl border border-dawn-border bg-gray-50">
+    <div className={`mx-auto w-full ${isHero ? "max-w-[280px]" : "max-w-[240px]"}`}>
+      <div
+        className={
+          isHero
+            ? "relative aspect-square overflow-hidden rounded-2xl shadow-lg ring-4 ring-white/20"
+            : "relative aspect-square overflow-hidden rounded-2xl border border-dawn-border bg-dawn-surface"
+        }
+      >
         {!imgError && (
           <Image
             src={imagePath}
             alt={`${name}（${flower}）のイラスト`}
             fill
             className="object-cover"
-            sizes="240px"
+            sizes={isHero ? "280px" : "240px"}
             onError={() => setImgError(true)}
           />
         )}
@@ -31,10 +43,14 @@ export function ResultIllustration({ type }: ResultIllustrationProps) {
             <p className="text-4xl" aria-hidden>
               🌸
             </p>
-            <p className="mt-2 text-lg font-semibold text-dawn-text">
+            <p
+              className={`mt-2 text-lg font-semibold ${isHero ? "text-white" : "text-dawn-text"}`}
+            >
               {flower}
             </p>
-            <p className="mt-1 text-xs text-dawn-muted">イラスト準備中</p>
+            <p className={`mt-1 text-xs ${isHero ? "text-white/80" : "text-dawn-muted"}`}>
+              イラスト準備中
+            </p>
           </div>
         )}
       </div>

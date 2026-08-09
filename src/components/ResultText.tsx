@@ -23,7 +23,7 @@ export function HighlightText({ text }: { text: string }) {
 
 export function SectionTitle({ children }: { children: ReactNode }) {
   return (
-    <h3 className="border-b-2 border-gray-400 pb-2 text-base font-bold tracking-wide text-dawn-text">
+    <h3 className="border-b-2 border-dawn-border pb-2 text-base font-bold tracking-wide text-dawn-text">
       {children}
     </h3>
   );

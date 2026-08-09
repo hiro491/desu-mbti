@@ -25,6 +25,80 @@ const SIZES: Record<AnswerValue, string> = {
   1: "h-9 w-9 sm:h-10 sm:w-10",
 };
 
+const CHECK_SIZES: Record<AnswerValue, string> = {
+  7: "h-4 w-4 sm:h-5 sm:w-5",
+  6: "h-3.5 w-3.5",
+  5: "h-3 w-3",
+  4: "h-2.5 w-2.5 sm:h-3 sm:w-3",
+  3: "h-3 w-3",
+  2: "h-3.5 w-3.5",
+  1: "h-4 w-4 sm:h-5 sm:w-5",
+};
+
+type ScaleSide = "azuki" | "neutral" | "odo";
+
+function getScaleSide(value: AnswerValue): ScaleSide {
+  if (value >= 5) return "azuki";
+  if (value === 4) return "neutral";
+  return "odo";
+}
+
+function buttonClass(side: ScaleSide, isSelected: boolean): string {
+  const base =
+    "group mx-auto flex items-center justify-center rounded-full border-2 transition-colors active:scale-95";
+
+  if (side === "azuki") {
+    return isSelected
+      ? `${base} border-azuki bg-azuki ring-2 ring-azuki/30 ring-offset-1`
+      : `${base} border-azuki bg-white hover:bg-azuki/5`;
+  }
+
+  if (side === "odo") {
+    return isSelected
+      ? `${base} border-odo bg-odo ring-2 ring-odo/30 ring-offset-1`
+      : `${base} border-odo bg-white hover:bg-odo/5`;
+  }
+
+  return isSelected
+    ? `${base} border-dawn-neutral bg-dawn-neutral ring-2 ring-dawn-neutral/30 ring-offset-1`
+    : `${base} border-dawn-neutral bg-white hover:bg-dawn-surface`;
+}
+
+function checkClass(side: ScaleSide, isSelected: boolean): string {
+  const base = "transition-opacity duration-150";
+
+  if (isSelected) {
+    return `${base} text-white opacity-100`;
+  }
+
+  if (side === "azuki") {
+    return `${base} text-azuki opacity-0 group-hover:opacity-100 group-focus-visible:opacity-100`;
+  }
+
+  if (side === "odo") {
+    return `${base} text-odo opacity-0 group-hover:opacity-100 group-focus-visible:opacity-100`;
+  }
+
+  return `${base} text-dawn-neutral opacity-0 group-hover:opacity-100 group-focus-visible:opacity-100`;
+}
+
+function CheckIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      className={className}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="3"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden
+    >
+      <path d="M5 13l4 4L19 7" />
+    </svg>
+  );
+}
+
 interface QuestionScaleProps {
   selected?: AnswerValue;
   onSelect: (value: AnswerValue) => void;
@@ -36,10 +110,7 @@ export function QuestionScale({ selected, onSelect }: QuestionScaleProps) {
       <div className="grid grid-cols-7 items-center gap-1 sm:gap-2">
         {VALUES.map((value) => {
           const isSelected = selected === value;
-
-          const ring = isSelected
-            ? "border-2 border-gray-600 bg-gray-500 ring-2 ring-gray-300 ring-offset-1"
-            : "border-2 border-gray-300 bg-gray-100 hover:border-gray-500 hover:bg-gray-200";
+          const side = getScaleSide(value);
 
           return (
             <button
@@ -48,14 +119,16 @@ export function QuestionScale({ selected, onSelect }: QuestionScaleProps) {
               onClick={() => onSelect(value)}
               aria-label={LABELS[value]}
               aria-pressed={isSelected}
-              className={`mx-auto rounded-full transition-colors active:scale-95 ${SIZES[value]} ${ring}`}
-            />
+              className={`${SIZES[value]} ${buttonClass(side, isSelected)}`}
+            >
+              <CheckIcon className={`${CHECK_SIZES[value]} ${checkClass(side, isSelected)}`} />
+            </button>
           );
         })}
       </div>
-      <div className="mt-2.5 flex justify-between px-0.5 text-xs font-semibold text-gray-600 sm:text-sm">
-        <span>そう思う</span>
-        <span>そう思わない</span>
+      <div className="mt-2.5 flex justify-between px-0.5 text-xs font-semibold sm:text-sm">
+        <span className="text-azuki">そう思う</span>
+        <span className="text-odo">そう思わない</span>
       </div>
     </div>
   );

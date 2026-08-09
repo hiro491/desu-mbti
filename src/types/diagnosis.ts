@@ -81,6 +81,15 @@ export interface DiagnosisResultSummary {
   catchphrase: string;
 }
 
+import type { AgeGroup, Gender } from "@/data/demographics";
+
+export interface DiagnosisDemographics {
+  gender: Gender;
+  ageGroup: AgeGroup;
+  genderLabel: string;
+  ageGroupLabel: string;
+}
+
 /** 診断結果の完全データ（回答・スコア・タイプ情報・タイムスタンプ） */
 export interface DiagnosisResultRecord {
   schemaVersion: typeof DIAGNOSIS_SCHEMA_VERSION;
@@ -91,6 +100,7 @@ export interface DiagnosisResultRecord {
   answers: DiagnosisAnswerEntry[];
   scores: DiagnosisScores;
   result: DiagnosisResultSummary;
+  demographics?: DiagnosisDemographics;
 }
 
 export const DIAGNOSIS_TYPES: DiagnosisType[] = [

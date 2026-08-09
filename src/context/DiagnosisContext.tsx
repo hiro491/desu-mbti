@@ -4,6 +4,7 @@ import {
   createContext,
   useCallback,
   useContext,
+  useEffect,
   useMemo,
   useState,
   type ReactNode,
@@ -13,8 +14,9 @@ import {
   getTotalPages,
   isPageComplete,
 } from "@/lib/question-pages";
-import { buildDiagnosisResultRecord } from "@/lib/diagnosis-record";
+import { buildDiagnosisResultRecord, buildDemographics } from "@/lib/diagnosis-record";
 import { computeDiagnosis } from "@/lib/scoring";
+import type { AgeGroup, Gender } from "@/data/demographics";
 import type {
   AnswerValue,
   DiagnosisResultRecord,
@@ -22,10 +24,11 @@ import type {
   DiagnosisType,
 } from "@/types/diagnosis";
 
-const ANSWERS_KEY = "desu-mbti-answers-v5";
-const RESULT_KEY = "desu-mbti-result-v5";
-const RECORD_KEY = "desu-mbti-record-v3";
-const PAGE_KEY = "desu-mbti-page-v5";
+const ANSWERS_KEY = "desu-mbti-answers-v6";
+const RESULT_KEY = "desu-mbti-result-v6";
+const RECORD_KEY = "desu-mbti-record-v4";
+const PAGE_KEY = "desu-mbti-page-v6";
+const DEMOGRAPHICS_KEY = "desu-mbti-demographics-v1";
 const STARTED_AT_KEY = "desu-mbti-started-at-v1";
 
 interface DiagnosisContextValue {
@@ -38,18 +41,61 @@ interface DiagnosisContextValue {
   setAnswer: (index: number, value: AnswerValue) => void;
   goNextPage: () => void;
   goPrevPage: () => void;
+  goToPage: (page: number) => void;
   isCurrentPageComplete: boolean;
   reset: () => void;
   diagnosis: DiagnosisScores | null;
   resultRecord: DiagnosisResultRecord | null;
   resultType: DiagnosisType | null;
   isComplete: boolean;
+  gender: Gender | null;
+  ageGroup: AgeGroup | null;
+  setGender: (gender: Gender) => void;
+  setAgeGroup: (ageGroup: AgeGroup) => void;
+  isDemographicsComplete: boolean;
+  submitDemographics: () => DiagnosisResultRecord | null;
 }
 
 const DiagnosisContext = createContext<DiagnosisContextValue | null>(null);
 
 function emptyAnswers(): (AnswerValue | undefined)[] {
   return Array(questions.length).fill(undefined);
+}
+
+function readStoredAnswers(): (AnswerValue | undefined)[] {
+  if (typeof window === "undefined") return emptyAnswers();
+  try {
+    const raw = sessionStorage.getItem(ANSWERS_KEY);
+    if (!raw) return emptyAnswers();
+    const parsed = JSON.parse(raw) as (AnswerValue | undefined)[];
+    if (!Array.isArray(parsed) || parsed.length !== questions.length) {
+      return emptyAnswers();
+    }
+    return parsed;
+  } catch {
+    return emptyAnswers();
+  }
+}
+
+function readStoredPage(): number {
+  if (typeof window === "undefined") return 0;
+  try {
+    const raw = sessionStorage.getItem(PAGE_KEY);
+    if (!raw) return 0;
+    const page = Number.parseInt(raw, 10);
+    if (Number.isNaN(page)) return 0;
+    return Math.min(Math.max(page, 0), getTotalPages() - 1);
+  } catch {
+    return 0;
+  }
+}
+
+function hasStoredSession(): boolean {
+  if (typeof window === "undefined") return false;
+  return (
+    sessionStorage.getItem(ANSWERS_KEY) !== null ||
+    sessionStorage.getItem(STARTED_AT_KEY) !== null
+  );
 }
 
 function saveAnswers(answers: (AnswerValue | undefined)[]) {
@@ -76,11 +122,40 @@ function getStartedAt(): string {
   return startedAt;
 }
 
+function saveDemographics(gender: Gender | null, ageGroup: AgeGroup | null) {
+  if (gender && ageGroup) {
+    sessionStorage.setItem(DEMOGRAPHICS_KEY, JSON.stringify({ gender, ageGroup }));
+    return;
+  }
+  sessionStorage.removeItem(DEMOGRAPHICS_KEY);
+}
+
+function readStoredDemographics(): {
+  gender: Gender | null;
+  ageGroup: AgeGroup | null;
+} {
+  if (typeof window === "undefined") {
+    return { gender: null, ageGroup: null };
+  }
+  try {
+    const raw = sessionStorage.getItem(DEMOGRAPHICS_KEY);
+    if (!raw) return { gender: null, ageGroup: null };
+    const parsed = JSON.parse(raw) as { gender?: Gender; ageGroup?: AgeGroup };
+    return {
+      gender: parsed.gender ?? null,
+      ageGroup: parsed.ageGroup ?? null,
+    };
+  } catch {
+    return { gender: null, ageGroup: null };
+  }
+}
+
 function clearSessionKeys() {
   sessionStorage.removeItem(ANSWERS_KEY);
   sessionStorage.removeItem(RESULT_KEY);
   sessionStorage.removeItem(RECORD_KEY);
   sessionStorage.removeItem(PAGE_KEY);
+  sessionStorage.removeItem(DEMOGRAPHICS_KEY);
   sessionStorage.removeItem(STARTED_AT_KEY);
 }
 
@@ -98,6 +173,7 @@ function readStoredRecord(): DiagnosisResultRecord | null {
 function persistCompletedRecord(
   answers: (AnswerValue | undefined)[],
   disclaimerAccepted: boolean,
+  demographics?: ReturnType<typeof buildDemographics>,
 ): DiagnosisResultRecord | null {
   const diagnosis = computeDiagnosis(answers);
   if (!diagnosis) return null;
@@ -105,10 +181,11 @@ function persistCompletedRecord(
   const existing = readStoredRecord();
   const record = buildDiagnosisResultRecord(answers, {
     startedAt: getStartedAt(),
-    completedAt: existing?.completedAt,
+    completedAt: demographics ? new Date().toISOString() : existing?.completedAt,
     disclaimerAccepted,
     scores: diagnosis,
     id: existing?.id,
+    demographics: demographics ?? existing?.demographics,
   });
 
   if (!record) return null;
@@ -119,13 +196,42 @@ function persistCompletedRecord(
 }
 
 export function DiagnosisProvider({ children }: { children: ReactNode }) {
-  const [answers, setAnswers] = useState<(AnswerValue | undefined)[]>(
-    emptyAnswers,
+  const [answers, setAnswers] = useState<(AnswerValue | undefined)[]>(() =>
+    typeof window === "undefined" ? emptyAnswers() : readStoredAnswers(),
   );
-  const [currentPage, setCurrentPage] = useState(0);
-  const [disclaimerAccepted, setDisclaimerAccepted] = useState(false);
+  const [currentPage, setCurrentPage] = useState(() =>
+    typeof window === "undefined" ? 0 : readStoredPage(),
+  );
+  const [disclaimerAccepted, setDisclaimerAccepted] = useState(
+    () => typeof window === "undefined" ? false : hasStoredSession(),
+  );
+  const [gender, setGenderState] = useState<Gender | null>(() =>
+    typeof window === "undefined" ? null : readStoredDemographics().gender,
+  );
+  const [ageGroup, setAgeGroupState] = useState<AgeGroup | null>(() =>
+    typeof window === "undefined" ? null : readStoredDemographics().ageGroup,
+  );
 
   const totalPages = getTotalPages();
+
+  const setGender = useCallback((value: Gender) => {
+    setGenderState(value);
+  }, []);
+
+  const setAgeGroup = useCallback((value: AgeGroup) => {
+    setAgeGroupState(value);
+  }, []);
+
+  useEffect(() => {
+    saveDemographics(gender, ageGroup);
+  }, [gender, ageGroup]);
+
+  useEffect(() => {
+    const stored = readStoredAnswers();
+    if (stored.some((answer) => answer !== undefined)) {
+      persistCompletedRecord(stored, hasStoredSession());
+    }
+  }, []);
 
   const acceptDisclaimer = useCallback(() => {
     getStartedAt();
@@ -158,12 +264,31 @@ export function DiagnosisProvider({ children }: { children: ReactNode }) {
     });
   }, []);
 
+  const goToPage = useCallback(
+    (page: number) => {
+      setCurrentPage(() => {
+        const next = Math.min(Math.max(page, 0), totalPages - 1);
+        savePage(next);
+        return next;
+      });
+    },
+    [totalPages],
+  );
+
   const reset = useCallback(() => {
     setAnswers(emptyAnswers());
     setCurrentPage(0);
     setDisclaimerAccepted(false);
+    setGenderState(null);
+    setAgeGroupState(null);
     clearSessionKeys();
   }, []);
+
+  const submitDemographics = useCallback(() => {
+    if (!gender || !ageGroup) return null;
+    const demographics = buildDemographics(gender, ageGroup);
+    return persistCompletedRecord(answers, disclaimerAccepted, demographics);
+  }, [answers, ageGroup, disclaimerAccepted, gender]);
 
   const diagnosis = useMemo(() => computeDiagnosis(answers), [answers]);
 
@@ -183,6 +308,8 @@ export function DiagnosisProvider({ children }: { children: ReactNode }) {
     [answers],
   );
 
+  const isDemographicsComplete = gender !== null && ageGroup !== null;
+
   const isCurrentPageComplete = useMemo(
     () => isPageComplete(currentPage, answers),
     [currentPage, answers],
@@ -199,12 +326,19 @@ export function DiagnosisProvider({ children }: { children: ReactNode }) {
       setAnswer,
       goNextPage,
       goPrevPage,
+      goToPage,
       isCurrentPageComplete,
       reset,
       diagnosis,
       resultRecord,
       resultType: diagnosis?.type ?? null,
       isComplete,
+      gender,
+      ageGroup,
+      setGender,
+      setAgeGroup,
+      isDemographicsComplete,
+      submitDemographics,
     }),
     [
       answers,
@@ -215,11 +349,18 @@ export function DiagnosisProvider({ children }: { children: ReactNode }) {
       setAnswer,
       goNextPage,
       goPrevPage,
+      goToPage,
       isCurrentPageComplete,
       reset,
       diagnosis,
       resultRecord,
       isComplete,
+      gender,
+      ageGroup,
+      setGender,
+      setAgeGroup,
+      isDemographicsComplete,
+      submitDemographics,
     ],
   );
 

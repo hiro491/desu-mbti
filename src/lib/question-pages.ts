@@ -15,6 +15,11 @@ export function getPageQuestionIndices(page: number): number[] {
   return Array.from({ length: end - start }, (_, i) => start + i);
 }
 
+export function getPageForQuestionIndex(index: number): number {
+  const perPage = Math.ceil(questions.length / TOTAL_PAGES);
+  return Math.floor(index / perPage);
+}
+
 export function isPageComplete(
   page: number,
   answers: (number | undefined)[],

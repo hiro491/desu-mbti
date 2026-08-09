@@ -10,7 +10,7 @@ export function StepProgressBar({ currentStep, totalSteps }: StepProgressBarProp
     <div className="flex min-w-0 flex-1 items-center gap-3">
       <div className="h-1.5 min-w-0 flex-1 overflow-hidden rounded-full bg-dawn-border">
         <div
-          className="h-full rounded-full bg-gray-500 transition-all duration-500"
+          className="h-full rounded-full bg-sumi transition-all duration-500"
           style={{ width: `${pct}%` }}
         />
       </div>

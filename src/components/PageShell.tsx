@@ -1,10 +1,9 @@
 import type { ReactNode } from "react";
-import { SITE_NAME } from "@/lib/site";
 
 interface PageShellProps {
   children: ReactNode;
   showDisclaimer?: boolean;
-  layout?: "center" | "scroll";
+  layout?: "center" | "scroll" | "result" | "wide";
 }
 
 export function PageShell({
@@ -13,12 +12,18 @@ export function PageShell({
   layout = "center",
 }: PageShellProps) {
   const mainClass =
-    layout === "scroll"
-      ? "relative z-10 mx-auto flex h-dvh w-full max-w-xl flex-col overflow-x-hidden overflow-y-hidden px-4 py-6 sm:px-6"
-      : "relative z-10 mx-auto flex min-h-screen max-w-xl flex-col justify-center px-4 py-10 sm:px-6";
+    layout === "result"
+      ? "relative z-10 mx-auto flex w-full max-w-xl flex-col px-0 pb-6 pt-4"
+      : layout === "wide"
+        ? "relative z-10 mx-auto flex w-full max-w-6xl flex-col px-4 py-8 sm:px-6 sm:py-10"
+        : layout === "scroll"
+          ? "relative z-10 mx-auto flex h-[calc(100dvh-3.5rem)] w-full max-w-xl flex-col overflow-x-hidden overflow-y-hidden px-4 py-6 sm:h-[calc(100dvh-4rem)] sm:px-6"
+          : "relative z-10 mx-auto flex min-h-[calc(100dvh-3.5rem)] max-w-xl flex-col justify-center px-4 py-10 sm:min-h-[calc(100dvh-4rem)] sm:px-6";
+
+  const pageBg = layout === "result" ? "bg-dawn-surface" : "bg-white";
 
   return (
-    <div className="relative min-h-screen bg-white text-dawn-text">
+    <div className={`relative min-h-[calc(100dvh-3.5rem)] text-dawn-text sm:min-h-[calc(100dvh-4rem)] ${pageBg}`}>
       <div
         className="pointer-events-none fixed inset-0 opacity-[0.04]"
         aria-hidden
@@ -27,18 +32,8 @@ export function PageShell({
         }}
       />
       <main className={mainClass}>
-        <header className="mb-6 shrink-0 text-center">
-          <h1 className="text-xl font-bold tracking-[0.2em] text-dawn-navy-deep sm:text-2xl">
-            {SITE_NAME}
-          </h1>
-          {layout === "center" && (
-            <p className="mt-1 text-xs text-dawn-muted">
-              16タイプで、いまのあなたを映し出す
-            </p>
-          )}
-        </header>
         {children}
-        {showDisclaimer && (
+        {showDisclaimer && layout !== "result" && (
           <p className="mt-8 shrink-0 text-center text-[0.7rem] leading-relaxed text-dawn-muted/90">
             本診断は自己理解のためのコンテンツです。深刻な不安がある場合は、信頼できる医療・相談窓口をご利用ください。
           </p>

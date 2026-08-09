@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { DiagnosisProvider } from "@/context/DiagnosisContext";
+import { SiteHeader } from "@/components/SiteHeader";
 import { SITE_DESCRIPTION, SITE_NAME, getSiteUrl } from "@/lib/site";
 import "./globals.css";
 
@@ -34,8 +35,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ja">
-      <body className="antialiased">
-        <DiagnosisProvider>{children}</DiagnosisProvider>
+      <body className="font-sans antialiased">
+        <DiagnosisProvider>
+          <SiteHeader />
+          {children}
+        </DiagnosisProvider>
       </body>
     </html>
   );

@@ -66,7 +66,7 @@ export default async function ResultPage({ params }: ResultPageProps) {
   const pageUrl = `${siteUrl}/result/${type}`;
 
   return (
-    <PageShell>
+    <PageShell layout="result" showDisclaimer={false}>
       <ResultContent type={type as DiagnosisType} shareUrl={pageUrl} />
     </PageShell>
   );

@@ -5,9 +5,15 @@ import { getTotalPages } from "@/lib/question-pages";
 
 export default function HomePage() {
   return (
-    <PageShell>
+    <PageShell layout="center">
       <section className="rounded-2xl border border-dawn-border bg-dawn-card p-6 shadow-sm sm:p-8">
-        <p className="text-sm leading-relaxed text-dawn-text">
+        <h1 className="text-center text-xl font-bold tracking-wide text-sumi sm:text-2xl">
+          デスタイプ診断
+        </h1>
+        <p className="mt-2 text-center text-xs text-dawn-muted">
+          16タイプで、いまのあなたを映し出す
+        </p>
+        <p className="mt-6 text-sm leading-relaxed text-dawn-text">
           デスタイプ診断は、死への情緒・死後の世界観・他者との距離・終末期のスタンスという4つの軸から、あなたの「今のタイプ」を16種類でやさしく映し出します。
         </p>
         <p className="mt-4 text-sm leading-relaxed text-dawn-text">

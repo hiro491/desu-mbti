@@ -9,7 +9,7 @@ import { QuestionScale } from "@/components/QuestionScale";
 import { StepProgressBar } from "@/components/StepProgressBar";
 import { questions } from "@/data/questions";
 import { useDiagnosis } from "@/context/DiagnosisContext";
-import { getPageQuestionIndices } from "@/lib/question-pages";
+import { getPageForQuestionIndex, getPageQuestionIndices } from "@/lib/question-pages";
 
 export default function QuestionPage() {
   const router = useRouter();
@@ -20,6 +20,7 @@ export default function QuestionPage() {
     setAnswer,
     goNextPage,
     goPrevPage,
+    goToPage,
     isCurrentPageComplete,
     isComplete,
     diagnosis,
@@ -66,12 +67,6 @@ export default function QuestionPage() {
   const isLastPage = currentPage === totalPages - 1;
 
   useEffect(() => {
-    if (isComplete && diagnosis?.type) {
-      router.replace(`/result/${diagnosis.type}`);
-    }
-  }, [isComplete, diagnosis?.type, router]);
-
-  useEffect(() => {
     setShowIncompleteHint(false);
     scrollToTop();
     requestAnimationFrame(() => scrollToTop());
@@ -94,10 +89,26 @@ export default function QuestionPage() {
       }
       return;
     }
-    if (isLastPage && isComplete && diagnosis?.type) {
-      router.replace(`/result/${diagnosis.type}`);
+
+    if (isLastPage) {
+      if (!isComplete || !diagnosis?.type) {
+        setShowIncompleteHint(true);
+        const firstUnanswered = answers.findIndex((a) => a === undefined);
+        if (firstUnanswered >= 0) {
+          const targetPage = getPageForQuestionIndex(firstUnanswered);
+          if (targetPage !== currentPage) {
+            goToPage(targetPage);
+          }
+          window.setTimeout(() => scrollToQuestion(firstUnanswered), 300);
+        }
+        return;
+      }
+
+      router.push("/demographics");
       return;
     }
+
+    setShowIncompleteHint(false);
     goNextPage();
   };
 
@@ -108,7 +119,7 @@ export default function QuestionPage() {
           <button
             type="button"
             onClick={goPrevPage}
-            className="shrink-0 text-xs font-medium text-gray-600 hover:text-gray-800"
+            className="shrink-0 text-xs font-medium text-dawn-muted hover:text-dawn-text"
           >
             ← 前のページ
           </button>
@@ -145,7 +156,7 @@ export default function QuestionPage() {
       <div className="fixed inset-x-0 bottom-0 z-20 border-t border-dawn-border bg-white/95 px-5 py-4 backdrop-blur-sm sm:px-6">
         <div className="mx-auto max-w-xl">
           {showIncompleteHint && (
-            <p className="mb-2 text-center text-xs text-gray-500">
+            <p className="mb-2 text-center text-xs text-dawn-muted">
               未回答の質問があります。すべて選んでから進んでください。
             </p>
           )}
@@ -154,7 +165,7 @@ export default function QuestionPage() {
             onClick={handleNext}
             className="btn-gray w-full rounded-xl py-3.5 text-sm font-bold"
           >
-            {isLastPage ? "結果を見る" : "次のページへ"}
+            {isLastPage ? "属性入力へ" : "次のページへ"}
           </button>
         </div>
       </div>
