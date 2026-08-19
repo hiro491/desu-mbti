@@ -81,13 +81,29 @@ export interface DiagnosisResultSummary {
   catchphrase: string;
 }
 
-import type { AgeGroup, Gender } from "@/data/demographics";
+import type {
+  AgeGroup,
+  BereavementExperience,
+  Gender,
+  MaritalStatus,
+  Occupation,
+  Residence,
+} from "@/data/demographics";
 
 export interface DiagnosisDemographics {
-  gender: Gender;
   ageGroup: AgeGroup;
-  genderLabel: string;
   ageGroupLabel: string;
+  gender: Gender;
+  genderLabel: string;
+  residence: Residence;
+  residenceLabel: string;
+  occupation: Occupation;
+  occupationLabel: string;
+  occupationOther?: string;
+  maritalStatus: MaritalStatus;
+  maritalStatusLabel: string;
+  bereavementExperience: BereavementExperience;
+  bereavementExperienceLabel: string;
 }
 
 /** 診断結果の完全データ（回答・スコア・タイプ情報・タイムスタンプ） */

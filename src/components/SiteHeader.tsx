@@ -7,6 +7,7 @@ import { usePathname } from "next/navigation";
 const ASSOCIATION_URL = "https://preview.studio.site/live/moWvKolzO6";
 
 const NAV_ITEMS = [
+  { href: "/about", label: "デスタイプ診断とは", match: (path: string) => path.startsWith("/about") },
   { href: "/types", label: "タイプ一覧", match: (path: string) => path.startsWith("/types") },
   {
     href: "/",
@@ -30,20 +31,20 @@ export function SiteHeader() {
           target="_blank"
           rel="noopener noreferrer"
           className="shrink-0"
-          aria-label="DEATH TECH ASSOCIATION（外部サイト）"
+          aria-label="DEATH TECH（外部サイト）"
         >
           <Image
-            src="/death-tech-association-logo.png"
-            alt="DEATH TECH ASSOCIATION"
-            width={180}
-            height={40}
+            src="/death-tech-logo-horizontal.png"
+            alt="DEATH TECH"
+            width={516}
+            height={178}
             className="h-7 w-auto sm:h-8"
             priority
           />
         </a>
 
         <nav
-          className="flex items-center gap-5 sm:gap-8"
+          className="flex items-center gap-3 sm:gap-5 lg:gap-8"
           aria-label="メインナビゲーション"
         >
           {NAV_ITEMS.map((item) => {
@@ -53,7 +54,7 @@ export function SiteHeader() {
               <Link
                 key={item.href}
                 href={item.href}
-                className={`text-[13px] font-normal leading-none tracking-normal transition-opacity sm:text-sm ${
+                className={`whitespace-nowrap text-[12px] font-normal leading-none tracking-normal transition-opacity sm:text-sm ${
                   active
                     ? "text-[#333333] opacity-100"
                     : "text-[#333333]/80 hover:text-[#333333] hover:opacity-100"

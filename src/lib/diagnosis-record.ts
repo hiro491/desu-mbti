@@ -1,5 +1,5 @@
-import type { AgeGroup, Gender } from "@/data/demographics";
-import { AGE_GROUP_OPTIONS, GENDER_OPTIONS } from "@/data/demographics";
+import type { DemographicsFormState } from "@/data/demographics";
+import { buildDemographicsPayload } from "@/data/demographics";
 import { questions } from "@/data/questions";
 import { getResult } from "@/data/results";
 import { computeDiagnosis } from "@/lib/scoring";
@@ -10,19 +10,6 @@ import type {
   DiagnosisScores,
 } from "@/types/diagnosis";
 import { DIAGNOSIS_SCHEMA_VERSION } from "@/types/diagnosis";
-
-function toDemographics(
-  gender: Gender,
-  ageGroup: AgeGroup,
-): DiagnosisDemographics {
-  const genderLabel =
-    GENDER_OPTIONS.find((option) => option.value === gender)?.label ?? gender;
-  const ageGroupLabel =
-    AGE_GROUP_OPTIONS.find((option) => option.value === ageGroup)?.label ??
-    ageGroup;
-
-  return { gender, ageGroup, genderLabel, ageGroupLabel };
-}
 
 function createRecordId(): string {
   if (typeof crypto !== "undefined" && "randomUUID" in crypto) {
@@ -77,10 +64,9 @@ export function buildDiagnosisResultRecord(
 }
 
 export function buildDemographics(
-  gender: Gender,
-  ageGroup: AgeGroup,
-): DiagnosisDemographics {
-  return toDemographics(gender, ageGroup);
+  state: DemographicsFormState,
+): DiagnosisDemographics | null {
+  return buildDemographicsPayload(state);
 }
 
 export function isDiagnosisResultRecord(

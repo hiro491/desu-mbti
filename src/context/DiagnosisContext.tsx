@@ -16,7 +16,11 @@ import {
 } from "@/lib/question-pages";
 import { buildDiagnosisResultRecord, buildDemographics } from "@/lib/diagnosis-record";
 import { computeDiagnosis } from "@/lib/scoring";
-import type { AgeGroup, Gender } from "@/data/demographics";
+import {
+  EMPTY_DEMOGRAPHICS,
+  isDemographicsFormComplete,
+  type DemographicsFormState,
+} from "@/data/demographics";
 import type {
   AnswerValue,
   DiagnosisResultRecord,
@@ -28,7 +32,7 @@ const ANSWERS_KEY = "desu-mbti-answers-v6";
 const RESULT_KEY = "desu-mbti-result-v6";
 const RECORD_KEY = "desu-mbti-record-v4";
 const PAGE_KEY = "desu-mbti-page-v6";
-const DEMOGRAPHICS_KEY = "desu-mbti-demographics-v1";
+const DEMOGRAPHICS_KEY = "desu-mbti-demographics-v2";
 const STARTED_AT_KEY = "desu-mbti-started-at-v1";
 
 interface DiagnosisContextValue {
@@ -48,10 +52,8 @@ interface DiagnosisContextValue {
   resultRecord: DiagnosisResultRecord | null;
   resultType: DiagnosisType | null;
   isComplete: boolean;
-  gender: Gender | null;
-  ageGroup: AgeGroup | null;
-  setGender: (gender: Gender) => void;
-  setAgeGroup: (ageGroup: AgeGroup) => void;
+  demographics: DemographicsFormState;
+  setDemographics: (value: DemographicsFormState) => void;
   isDemographicsComplete: boolean;
   submitDemographics: () => DiagnosisResultRecord | null;
 }
@@ -122,31 +124,37 @@ function getStartedAt(): string {
   return startedAt;
 }
 
-function saveDemographics(gender: Gender | null, ageGroup: AgeGroup | null) {
-  if (gender && ageGroup) {
-    sessionStorage.setItem(DEMOGRAPHICS_KEY, JSON.stringify({ gender, ageGroup }));
+function saveDemographicsState(state: DemographicsFormState) {
+  const hasAnyValue = Object.entries(state).some(([key, value]) => {
+    if (key === "occupationOther") return value !== "";
+    return value !== null;
+  });
+
+  if (!hasAnyValue) {
+    sessionStorage.removeItem(DEMOGRAPHICS_KEY);
     return;
   }
-  sessionStorage.removeItem(DEMOGRAPHICS_KEY);
+
+  sessionStorage.setItem(DEMOGRAPHICS_KEY, JSON.stringify(state));
 }
 
-function readStoredDemographics(): {
-  gender: Gender | null;
-  ageGroup: AgeGroup | null;
-} {
+function readStoredDemographics(): DemographicsFormState {
   if (typeof window === "undefined") {
-    return { gender: null, ageGroup: null };
+    return { ...EMPTY_DEMOGRAPHICS };
   }
+
   try {
     const raw = sessionStorage.getItem(DEMOGRAPHICS_KEY);
-    if (!raw) return { gender: null, ageGroup: null };
-    const parsed = JSON.parse(raw) as { gender?: Gender; ageGroup?: AgeGroup };
+    if (!raw) return { ...EMPTY_DEMOGRAPHICS };
+
+    const parsed = JSON.parse(raw) as Partial<DemographicsFormState>;
     return {
-      gender: parsed.gender ?? null,
-      ageGroup: parsed.ageGroup ?? null,
+      ...EMPTY_DEMOGRAPHICS,
+      ...parsed,
+      occupationOther: parsed.occupationOther ?? "",
     };
   } catch {
-    return { gender: null, ageGroup: null };
+    return { ...EMPTY_DEMOGRAPHICS };
   }
 }
 
@@ -205,26 +213,19 @@ export function DiagnosisProvider({ children }: { children: ReactNode }) {
   const [disclaimerAccepted, setDisclaimerAccepted] = useState(
     () => typeof window === "undefined" ? false : hasStoredSession(),
   );
-  const [gender, setGenderState] = useState<Gender | null>(() =>
-    typeof window === "undefined" ? null : readStoredDemographics().gender,
-  );
-  const [ageGroup, setAgeGroupState] = useState<AgeGroup | null>(() =>
-    typeof window === "undefined" ? null : readStoredDemographics().ageGroup,
+  const [demographics, setDemographicsState] = useState<DemographicsFormState>(() =>
+    typeof window === "undefined" ? { ...EMPTY_DEMOGRAPHICS } : readStoredDemographics(),
   );
 
   const totalPages = getTotalPages();
 
-  const setGender = useCallback((value: Gender) => {
-    setGenderState(value);
-  }, []);
-
-  const setAgeGroup = useCallback((value: AgeGroup) => {
-    setAgeGroupState(value);
+  const setDemographics = useCallback((value: DemographicsFormState) => {
+    setDemographicsState(value);
   }, []);
 
   useEffect(() => {
-    saveDemographics(gender, ageGroup);
-  }, [gender, ageGroup]);
+    saveDemographicsState(demographics);
+  }, [demographics]);
 
   useEffect(() => {
     const stored = readStoredAnswers();
@@ -279,16 +280,15 @@ export function DiagnosisProvider({ children }: { children: ReactNode }) {
     setAnswers(emptyAnswers());
     setCurrentPage(0);
     setDisclaimerAccepted(false);
-    setGenderState(null);
-    setAgeGroupState(null);
+    setDemographicsState({ ...EMPTY_DEMOGRAPHICS });
     clearSessionKeys();
   }, []);
 
   const submitDemographics = useCallback(() => {
-    if (!gender || !ageGroup) return null;
-    const demographics = buildDemographics(gender, ageGroup);
-    return persistCompletedRecord(answers, disclaimerAccepted, demographics);
-  }, [answers, ageGroup, disclaimerAccepted, gender]);
+    const payload = buildDemographics(demographics);
+    if (!payload) return null;
+    return persistCompletedRecord(answers, disclaimerAccepted, payload);
+  }, [answers, demographics, disclaimerAccepted]);
 
   const diagnosis = useMemo(() => computeDiagnosis(answers), [answers]);
 
@@ -308,7 +308,7 @@ export function DiagnosisProvider({ children }: { children: ReactNode }) {
     [answers],
   );
 
-  const isDemographicsComplete = gender !== null && ageGroup !== null;
+  const isDemographicsComplete = isDemographicsFormComplete(demographics);
 
   const isCurrentPageComplete = useMemo(
     () => isPageComplete(currentPage, answers),
@@ -333,10 +333,8 @@ export function DiagnosisProvider({ children }: { children: ReactNode }) {
       resultRecord,
       resultType: diagnosis?.type ?? null,
       isComplete,
-      gender,
-      ageGroup,
-      setGender,
-      setAgeGroup,
+      demographics,
+      setDemographics,
       isDemographicsComplete,
       submitDemographics,
     }),
@@ -355,10 +353,8 @@ export function DiagnosisProvider({ children }: { children: ReactNode }) {
       diagnosis,
       resultRecord,
       isComplete,
-      gender,
-      ageGroup,
-      setGender,
-      setAgeGroup,
+      demographics,
+      setDemographics,
       isDemographicsComplete,
       submitDemographics,
     ],

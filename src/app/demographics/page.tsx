@@ -11,10 +11,8 @@ export default function DemographicsPage() {
   const {
     isComplete,
     diagnosis,
-    gender,
-    ageGroup,
-    setGender,
-    setAgeGroup,
+    demographics,
+    setDemographics,
     isDemographicsComplete,
     submitDemographics,
   } = useDiagnosis();
@@ -47,12 +45,7 @@ export default function DemographicsPage() {
     <PageShell showDisclaimer={false} layout="scroll">
       <div className="min-h-0 flex-1 overflow-y-auto pb-28">
         <section className="rounded-2xl border border-dawn-border bg-dawn-card p-5 shadow-sm sm:p-6">
-          <DemographicsForm
-            gender={gender}
-            ageGroup={ageGroup}
-            onGenderChange={setGender}
-            onAgeGroupChange={setAgeGroup}
-          />
+          <DemographicsForm value={demographics} onChange={setDemographics} />
         </section>
       </div>
 
@@ -60,7 +53,7 @@ export default function DemographicsPage() {
         <div className="mx-auto max-w-xl">
           {showIncompleteHint && (
             <p className="mb-2 text-center text-xs text-dawn-muted">
-              性別と年齢層の両方を選んでから進んでください。
+              すべての必須項目（*）に回答してから進んでください。
             </p>
           )}
           <button
