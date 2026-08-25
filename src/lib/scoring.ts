@@ -30,9 +30,8 @@ const DIMENSION_POLES: Record<DimensionKey, [string, string]> = {
 
 export const DEFAULT_TIE_TYPE: DiagnosisType = "ASCN";
 
-function centeredWeight(value: AnswerValue, reversed?: boolean): number {
-  const centered = value - 4;
-  return reversed ? -centered : centered;
+function answerWeight(value: AnswerValue, reversed?: boolean): number {
+  return reversed ? 8 - value : value;
 }
 
 function addToRaw(
@@ -106,7 +105,7 @@ export function computeRawScores(
     if (q.excludeFromScoring) return;
     const value = answers[i];
     if (value === undefined) return;
-    const weight = centeredWeight(value, q.reversed);
+    const weight = answerWeight(value, q.reversed);
     addToRaw(raw, q.dimension, q.poleOnAgree, weight);
   });
 

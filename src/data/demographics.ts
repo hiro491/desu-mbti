@@ -145,25 +145,64 @@ function labelFor<T extends string>(
   return options.find((option) => option.value === value)?.label ?? value;
 }
 
+export const DEMOGRAPHIC_SECTION_COUNT = 6;
+
+export function isDemographicSectionComplete(
+  state: DemographicsFormState,
+  sectionIndex: number,
+): boolean {
+  switch (sectionIndex) {
+    case 0:
+      return state.ageGroup !== null;
+    case 1:
+      return state.gender !== null;
+    case 2:
+      return state.residence !== null;
+    case 3:
+      return (
+        state.occupation !== null &&
+        (state.occupation !== "other" || state.occupationOther.trim() !== "")
+      );
+    case 4:
+      return state.maritalStatus !== null;
+    case 5:
+      return state.bereavementExperience !== null;
+    default:
+      return false;
+  }
+}
+
+export function getFirstIncompleteDemographicSectionIndex(
+  state: DemographicsFormState,
+): number | undefined {
+  for (let index = 0; index < DEMOGRAPHIC_SECTION_COUNT; index += 1) {
+    if (!isDemographicSectionComplete(state, index)) {
+      return index;
+    }
+  }
+  return undefined;
+}
+
+export function getNextIncompleteDemographicSectionIndex(
+  state: DemographicsFormState,
+  afterSectionIndex: number,
+): number | undefined {
+  for (
+    let index = afterSectionIndex + 1;
+    index < DEMOGRAPHIC_SECTION_COUNT;
+    index += 1
+  ) {
+    if (!isDemographicSectionComplete(state, index)) {
+      return index;
+    }
+  }
+  return undefined;
+}
+
 export function isDemographicsFormComplete(
   state: DemographicsFormState,
 ): boolean {
-  if (
-    !state.ageGroup ||
-    !state.gender ||
-    !state.residence ||
-    !state.occupation ||
-    !state.maritalStatus ||
-    !state.bereavementExperience
-  ) {
-    return false;
-  }
-
-  if (state.occupation === "other" && !state.occupationOther.trim()) {
-    return false;
-  }
-
-  return true;
+  return getFirstIncompleteDemographicSectionIndex(state) === undefined;
 }
 
 export interface DemographicsPayload {
