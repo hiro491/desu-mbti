@@ -30,39 +30,46 @@ const DIMENSION_POLES: Record<DimensionKey, [string, string]> = {
 
 export const DEFAULT_TIE_TYPE: DiagnosisType = "ASCN";
 
-function answerWeight(value: AnswerValue, reversed?: boolean): number {
-  return reversed ? 8 - value : value;
-}
+/** 各極スコアの最小値（純1×3 + 逆1×3） */
+const MIN_POLE_SCORE = 6;
+/** 各極スコアの最大値（純7×3 + 逆7×3） */
+const MAX_POLE_SCORE = 42;
+/** 正規化レンジ（42 - 6） */
+const POLE_SCORE_RANGE = MAX_POLE_SCORE - MIN_POLE_SCORE;
 
-function addToRaw(
+/**
+ * 各次元6問（純3 + 逆3）の双方向採点。
+ * - 純質問（poleOnAgree 側）: 選択値をその極へ加算
+ * - 逆転質問（反対極）: (8 - 選択値) を加算
+ *
+ * 左極スコア = 左極純質問3問の合計 + 右極逆転3問の (8-回答) 合計
+ */
+function applyAnswerToRaw(
   raw: RawScores,
   dimension: DimensionKey,
-  pole: string,
-  weight: number,
+  poleOnAgree: string,
+  value: AnswerValue,
 ) {
+  const [left, right] = DIMENSION_POLES[dimension];
   const pair = raw[dimension] as Record<string, number>;
-  pair[pole] += weight;
+  const opposite = poleOnAgree === left ? right : left;
+
+  pair[poleOnAgree] += value;
+  pair[opposite] += 8 - value;
 }
 
-function toPercent(left: number, right: number): { left: number; right: number } {
-  const adjLeft = Math.max(0, left);
-  const adjRight = Math.max(0, right);
-  const total = adjLeft + adjRight;
-  if (total === 0) return { left: 50, right: 50 };
-  const leftPct = Math.round((adjLeft / total) * 100);
-  return { left: leftPct, right: 100 - leftPct };
+/** 極スコアを 0〜100% に正規化: (スコア - 6) ÷ 36 × 100 */
+function scoreToPercent(score: number): number {
+  const pct = Math.round(((score - MIN_POLE_SCORE) / POLE_SCORE_RANGE) * 100);
+  return Math.min(100, Math.max(0, pct));
 }
 
 function buildPercent(raw: RawScores): DimensionPercentages {
-  const fa = toPercent(raw.FA.F, raw.FA.A);
-  const sn = toPercent(raw.SN.S, raw.SN.N);
-  const ic = toPercent(raw.IC.I, raw.IC.C);
-  const tn = toPercent(raw.TN.T, raw.TN.N);
   return {
-    FA: { F: fa.left, A: fa.right },
-    SN: { S: sn.left, N: sn.right },
-    IC: { I: ic.left, C: ic.right },
-    TN: { T: tn.left, N: tn.right },
+    FA: { F: scoreToPercent(raw.FA.F), A: scoreToPercent(raw.FA.A) },
+    SN: { S: scoreToPercent(raw.SN.S), N: scoreToPercent(raw.SN.N) },
+    IC: { I: scoreToPercent(raw.IC.I), C: scoreToPercent(raw.IC.C) },
+    TN: { T: scoreToPercent(raw.TN.T), N: scoreToPercent(raw.TN.N) },
   };
 }
 
@@ -105,8 +112,7 @@ export function computeRawScores(
     if (q.excludeFromScoring) return;
     const value = answers[i];
     if (value === undefined) return;
-    const weight = answerWeight(value, q.reversed);
-    addToRaw(raw, q.dimension, q.poleOnAgree, weight);
+    applyAnswerToRaw(raw, q.dimension, q.poleOnAgree, value);
   });
 
   return raw;
