@@ -1,5 +1,7 @@
 export const SITE_NAME = "デスタイプ診断";
 export const DEATH_TECH_URL = "https://death-tech.org/";
+/** Bump when character flower images are replaced (cache busting for next/image). */
+export const CHARACTER_IMAGE_VERSION = "20250827";
 export const SITE_DESCRIPTION =
   "死への情緒・死後の世界観・他者との距離・終末期のスタンスの4つの軸から、あなたのタイプを16種類で診断します。";
 

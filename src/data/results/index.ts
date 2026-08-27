@@ -1,4 +1,5 @@
 import type { DiagnosisType } from "@/types/diagnosis";
+import { CHARACTER_IMAGE_VERSION } from "@/lib/site";
 import { anTypes } from "./an-types";
 import { asTypes } from "./as-types";
 import { fnTypes } from "./fn-types";
@@ -15,5 +16,9 @@ export const results: Record<DiagnosisType, TypeResult> = {
 };
 
 export function getResult(type: DiagnosisType): TypeResult {
-  return results[type];
+  const result = results[type];
+  return {
+    ...result,
+    imagePath: `${result.imagePath}?v=${CHARACTER_IMAGE_VERSION}`,
+  };
 }
