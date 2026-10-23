@@ -1,7 +1,9 @@
 "use client";
 
+import type { MemberCompany } from "@/data/member-companies";
 import type { TypeResult } from "@/data/results/types";
 import { HighlightText } from "@/components/ResultText";
+import { MemberCompanyList } from "@/components/MemberCompanyList";
 import { ResultSectionHeader } from "@/components/ResultSectionHeader";
 
 function ResultCard({
@@ -23,11 +25,13 @@ function ResultCard({
 interface ResultDetailSectionsProps {
   result: TypeResult;
   startNumber?: number;
+  memberCompanies?: MemberCompany[];
 }
 
 export function ResultDetailSections({
   result,
   startNumber = 3,
+  memberCompanies = [],
 }: ResultDetailSectionsProps) {
   const sections = [
     {
@@ -45,13 +49,16 @@ export function ResultDetailSections({
     {
       title: "向いている終活",
       content: (
-        <ul className="list-disc space-y-3 pl-5">
-          {result.endOfLifeSteps.map((step, index) => (
-            <li key={index} className="leading-7 text-dawn-text">
-              <HighlightText text={step.text} />
-            </li>
-          ))}
-        </ul>
+        <>
+          <ul className="list-disc space-y-3 pl-5">
+            {result.endOfLifeSteps.map((step, index) => (
+              <li key={index} className="leading-7 text-dawn-text">
+                <HighlightText text={step.text} />
+              </li>
+            ))}
+          </ul>
+          <MemberCompanyList companies={memberCompanies} />
+        </>
       ),
     },
     {

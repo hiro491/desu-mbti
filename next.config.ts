@@ -14,6 +14,9 @@ const nextConfig: NextConfig = {
       {
         pathname: "/death-tech-association-logo.png",
       },
+      {
+        pathname: "/members/**",
+      },
     ],
   },
   async redirects() {

@@ -7,6 +7,7 @@ import { ResultDetailSections } from "@/components/ResultDetailSections";
 import { ResultHero } from "@/components/ResultHero";
 import { ResultSectionHeader } from "@/components/ResultSectionHeader";
 import { ShareButtons } from "@/components/ShareButtons";
+import { getMemberCompaniesForType } from "@/data/member-companies";
 import { getResult } from "@/data/results";
 import {
   loadStoredDiagnosis,
@@ -46,6 +47,7 @@ function pickRecord(
 
 export function ResultContent({ type, shareUrl }: ResultContentProps) {
   const result = getResult(type);
+  const memberCompanies = getMemberCompaniesForType(type);
   const { diagnosis, resultRecord } = useDiagnosis();
   const [storedScores] = useState<DiagnosisScores | null>(() =>
     loadStoredDiagnosis(),
@@ -98,7 +100,11 @@ export function ResultContent({ type, shareUrl }: ResultContentProps) {
         </section>
 
         <div className="mt-10">
-          <ResultDetailSections result={result} startNumber={3} />
+          <ResultDetailSections
+            result={result}
+            startNumber={3}
+            memberCompanies={memberCompanies}
+          />
         </div>
 
         <div className="mt-12 rounded-xl bg-white p-5 shadow-sm sm:p-6">
